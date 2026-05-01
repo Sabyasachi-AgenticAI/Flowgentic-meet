@@ -60,6 +60,7 @@ export function PageClientImpl(props: {
     const url = new URL(CONN_DETAILS_ENDPOINT, window.location.origin);
     url.searchParams.append('roomName', props.roomName);
     url.searchParams.append('participantName', values.username);
+    url.searchParams.append('metadata', JSON.stringify({ sandboxId: 'allion-6ut898' }));
     if (props.region) {
       url.searchParams.append('region', props.region);
     }
@@ -223,9 +224,60 @@ function VideoConferenceComponent(props: {
     }
   }, [lowPowerMode]);
 
+  const [selectedAgent, setSelectedAgent] = React.useState('Riley-2252');
+  const [isInviting, setIsInviting] = React.useState(false);
+  
+  const handleInviteAgent = React.useCallback(async () => {
+    setIsInviting(true);
+    try {
+      const response = await fetch('/api/invite-agent', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          roomName: props.connectionDetails.roomName,
+          agentName: selectedAgent 
+        }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to invite agent');
+      }
+    } catch (error) {
+      console.error(error);
+      alert(`Failed to invite agent: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsInviting(false);
+    }
+  }, [props.connectionDetails.roomName]);
+
   return (
-    <div className="lk-room-container">
+    <div className="lk-room-container" style={{ position: 'relative' }}>
       <RoomContext.Provider value={room}>
+        <div style={{ position: 'fixed', top: '1.5rem', left: '50%', transform: 'translateX(-50%)', zIndex: 1000, display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1.5rem', borderRadius: '2rem', border: '1px solid var(--border)', backdropFilter: 'blur(10px)', color: 'white', fontWeight: 'bold', fontSize: '1.1rem' }}>
+            Flowgentic AI
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.3rem 0.5rem', borderRadius: '2rem', border: '1px solid var(--border)', backdropFilter: 'blur(10px)' }}>
+            <select 
+              value={selectedAgent} 
+              onChange={(e) => setSelectedAgent(e.target.value)}
+              style={{ background: 'transparent', color: 'white', border: 'none', padding: '0.2rem 0.5rem', cursor: 'pointer', outline: 'none' }}
+            >
+              <option value="Riley-2252">Riley (Voice)</option>
+              <option value="Samantha">Samantha (Meeting Assistant)</option>
+              <option value="Jarvis">Jarvis (Tech Expert)</option>
+              <option value="Nova">Nova (Creative Lead)</option>
+            </select>
+            <button 
+              className="flowgentic-btn" 
+              onClick={handleInviteAgent}
+              disabled={isInviting}
+              style={{ padding: '0.4rem 1.2rem', fontSize: '0.85rem' }}
+            >
+              {isInviting ? 'Summoning...' : 'Summon'}
+            </button>
+          </div>
+        </div>
         <KeyboardShortcuts />
         <VideoConference
           chatMessageFormatter={formatChatMessageLinks}

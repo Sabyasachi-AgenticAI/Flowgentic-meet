@@ -6,52 +6,46 @@ import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: {
-    default: 'LiveKit Meet | Conference app build with LiveKit open source',
-    template: '%s',
+    default: 'Flowgentic Meet | Next-Gen AI Conferencing',
+    template: '%s | Flowgentic Meet',
   },
   description:
-    'LiveKit is an open source WebRTC project that gives you everything needed to build scalable and real-time audio and/or video experiences in your applications.',
+    'The next generation of AI-native video conferencing. Collaborate seamlessly with intelligent voice agents on the Flowgentic Meet platform.',
   twitter: {
-    creator: '@livekitted',
-    site: '@livekitted',
+    creator: '@flowgentic',
+    site: '@flowgentic',
     card: 'summary_large_image',
   },
   openGraph: {
-    url: 'https://meet.livekit.io',
+    url: 'https://flowgentic.ai',
     images: [
       {
-        url: 'https://meet.livekit.io/images/livekit-meet-open-graph.png',
+        url: '/images/flowgentic-og.png',
         width: 2000,
         height: 1000,
         type: 'image/png',
       },
     ],
-    siteName: 'LiveKit Meet',
+    siteName: 'Flowgentic Meet',
   },
   icons: {
     icon: {
       rel: 'icon',
       url: '/favicon.ico',
     },
-    apple: [
-      {
-        rel: 'apple-touch-icon',
-        url: '/images/livekit-apple-touch.png',
-        sizes: '180x180',
-      },
-      { rel: 'mask-icon', url: '/images/livekit-safari-pinned-tab.svg', color: '#070707' },
-    ],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#070707',
+  themeColor: '#09090b',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body data-lk-theme="default">
+        <div className="bg-blob-1"></div>
+        <div className="bg-blob-2"></div>
         <Toaster />
         {children}
       </body>
