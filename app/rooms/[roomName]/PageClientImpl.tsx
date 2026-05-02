@@ -253,30 +253,38 @@ function VideoConferenceComponent(props: {
   return (
     <div className="lk-room-container" style={{ position: 'relative' }}>
       <RoomContext.Provider value={room}>
-        <div style={{ position: 'fixed', top: '1.5rem', left: '50%', transform: 'translateX(-50%)', zIndex: 1000, display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1.5rem', borderRadius: '2rem', border: '1px solid var(--border)', backdropFilter: 'blur(10px)', color: 'white', fontWeight: 'bold', fontSize: '1.1rem' }}>
-            Flowgentic AI
-          </div>
-          <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.3rem 0.5rem', borderRadius: '2rem', border: '1px solid var(--border)', backdropFilter: 'blur(10px)' }}>
-            <select 
-              value={selectedAgent} 
-              onChange={(e) => setSelectedAgent(e.target.value)}
-              style={{ background: 'transparent', color: 'white', border: 'none', padding: '0.2rem 0.5rem', cursor: 'pointer', outline: 'none' }}
-            >
-              <option value="Riley-2252">Riley (Voice)</option>
-              <option value="Samantha">Samantha (Meeting Assistant)</option>
-              <option value="Jarvis">Jarvis (Tech Expert)</option>
-              <option value="Nova">Nova (Creative Lead)</option>
-            </select>
-            <button 
-              className="flowgentic-btn" 
-              onClick={handleInviteAgent}
-              disabled={isInviting}
-              style={{ padding: '0.4rem 1.2rem', fontSize: '0.85rem' }}
-            >
-              {isInviting ? 'Summoning...' : 'Summon'}
-            </button>
-          </div>
+        <div style={{ position: 'fixed', top: '1.5rem', left: '1.5rem', zIndex: 1000 }}>
+          <button 
+            className="flowgentic-btn"
+            style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1.2rem', borderRadius: '2rem', border: '1px solid var(--border)', backdropFilter: 'blur(10px)', color: 'white', fontSize: '0.9rem', cursor: 'pointer' }}
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+              alert('Meeting link copied!');
+            }}
+          >
+            Meeting Link
+          </button>
+        </div>
+
+        <div style={{ position: 'fixed', top: '1.5rem', left: '50%', transform: 'translateX(-50%)', zIndex: 1000, display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.3rem 0.5rem', borderRadius: '2rem', border: '1px solid var(--border)', backdropFilter: 'blur(10px)' }}>
+          <select 
+            value={selectedAgent} 
+            onChange={(e) => setSelectedAgent(e.target.value)}
+            style={{ background: 'transparent', color: 'white', border: 'none', padding: '0.2rem 0.5rem', cursor: 'pointer', outline: 'none' }}
+          >
+            <option value="Riley-2252">Riley (Voice)</option>
+            <option value="Samantha">Samantha (Meeting Assistant)</option>
+            <option value="Jarvis">Jarvis (Tech Expert)</option>
+            <option value="Nova">Nova (Creative Lead)</option>
+          </select>
+          <button 
+            className="flowgentic-btn" 
+            onClick={handleInviteAgent}
+            disabled={isInviting}
+            style={{ padding: '0.4rem 1.2rem', fontSize: '0.85rem' }}
+          >
+            {isInviting ? 'Summoning...' : 'Summon'}
+          </button>
         </div>
         <KeyboardShortcuts />
         <VideoConference
