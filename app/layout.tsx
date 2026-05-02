@@ -40,15 +40,19 @@ export const viewport: Viewport = {
   themeColor: '#09090b',
 };
 
+import { ClerkProvider } from '@clerk/nextjs';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body data-lk-theme="default">
-        <div className="bg-blob-1"></div>
-        <div className="bg-blob-2"></div>
-        <Toaster />
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body data-lk-theme="default">
+          <div className="bg-blob-1"></div>
+          <div className="bg-blob-2"></div>
+          <Toaster />
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
