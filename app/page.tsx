@@ -43,7 +43,7 @@ export default function Page() {
         {isLoaded && isSignedIn && (
           <>
             <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
-              <UserButton afterSignOutUrl="/" />
+              <UserButton />
             </div>
             
             <div className={styles.actionContainer} style={{ width: '100%', maxWidth: '350px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
