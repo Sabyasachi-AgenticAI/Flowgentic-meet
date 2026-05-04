@@ -14,7 +14,7 @@ export default function Page() {
 
   const startMeeting = () => {
     const roomId = generateRoomId();
-    router.push(`/rooms/${roomId}`);
+    router.push(`/rooms/${roomId}?host=true`);
   };
 
   const createInviteLink = () => {
@@ -92,12 +92,21 @@ export default function Page() {
                     <code style={{ fontSize: '0.9rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{generatedLink}</code>
                     <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 'bold' }}>COPIED!</span>
                   </div>
-                  <a 
-                    href={`mailto:?subject=${emailSubject}&body=${emailBody(generatedLink)}`}
-                    style={{ color: '#ec4899', textDecoration: 'none', fontSize: '0.95rem', fontWeight: '700' }}
-                  >
-                    Send via Email
-                  </a>
+                  <div style={{ display: 'flex', gap: '1rem', width: '100%', justifyContent: 'center' }}>
+                    <a 
+                      href={`mailto:?subject=${emailSubject}&body=${emailBody(generatedLink)}`}
+                      style={{ color: '#ec4899', textDecoration: 'none', fontSize: '0.95rem', fontWeight: '700' }}
+                    >
+                      Send via Email
+                    </a>
+                    <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
+                    <a 
+                      href={`${generatedLink}?host=true`}
+                      style={{ color: '#10b981', textDecoration: 'none', fontSize: '0.95rem', fontWeight: '700' }}
+                    >
+                      Join as Host
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
