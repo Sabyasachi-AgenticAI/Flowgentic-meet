@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     const participantName = request.nextUrl.searchParams.get('participantName');
     const metadata = request.nextUrl.searchParams.get('metadata') ?? '';
     const region = request.nextUrl.searchParams.get('region');
+    const isHost = request.nextUrl.searchParams.get('isHost') === 'true';
     if (!LIVEKIT_URL) {
       throw new Error('LIVEKIT_URL is not defined');
     }
@@ -44,6 +45,7 @@ export async function GET(request: NextRequest) {
         metadata,
       },
       roomName,
+      isHost
     );
 
     // Return connection details
@@ -66,7 +68,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function createParticipantToken(userInfo: AccessTokenOptions, roomName: string) {
+function createParticipantToken(userInfo: AccessTokenOptions, roomName: string, isHost: boolean = false) {
   const at = new AccessToken(API_KEY, API_SECRET, userInfo);
   at.ttl = '5m';
   const grant: VideoGrant = {
@@ -75,6 +77,7 @@ function createParticipantToken(userInfo: AccessTokenOptions, roomName: string) 
     canPublish: true,
     canPublishData: true,
     canSubscribe: true,
+    roomAdmin: isHost,
   };
   at.addGrant(grant);
   return at.toJwt();

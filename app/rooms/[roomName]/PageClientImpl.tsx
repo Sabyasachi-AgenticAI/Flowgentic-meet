@@ -40,6 +40,7 @@ export function PageClientImpl(props: {
   hq: boolean;
   codec: VideoCodec;
   singlePeerConnection: boolean;
+  isHost?: boolean;
 }) {
   const [preJoinChoices, setPreJoinChoices] = React.useState<LocalUserChoices | undefined>(
     undefined,
@@ -63,6 +64,9 @@ export function PageClientImpl(props: {
     url.searchParams.append('metadata', JSON.stringify({ sandboxId: 'allion-6ut898' }));
     if (props.region) {
       url.searchParams.append('region', props.region);
+    }
+    if (props.isHost) {
+      url.searchParams.append('isHost', 'true');
     }
     const connectionDetailsResp = await fetch(url.toString());
     const connectionDetailsData = await connectionDetailsResp.json();
@@ -89,6 +93,7 @@ export function PageClientImpl(props: {
             hq: props.hq,
             singlePeerConnection: props.singlePeerConnection,
           }}
+          isHost={props.isHost}
         />
       )}
     </main>
@@ -103,6 +108,7 @@ function VideoConferenceComponent(props: {
     codec: VideoCodec;
     singlePeerConnection: boolean;
   };
+  isHost?: boolean;
 }) {
   const keyProvider = new ExternalE2EEKeyProvider();
   const { worker, e2eePassphrase } = useSetupE2EE();
@@ -248,7 +254,42 @@ function VideoConferenceComponent(props: {
     } finally {
       setIsInviting(false);
     }
-  }, [props.connectionDetails.roomName]);
+  }, [props.connectionDetails.roomName, selectedAgent]);
+
+  const handleMuteAgent = React.useCallback(async () => {
+    const agentParticipant = Array.from(room.remoteParticipants.values()).find(p => p.identity.includes(selectedAgent) || p.name === selectedAgent);
+    if (!agentParticipant) {
+      alert('Agent is not currently in the room.');
+      return;
+    }
+    
+    const micTrack = agentParticipant.getTrackPublication(Track.Source.Microphone);
+    if (!micTrack) {
+      alert('Agent does not have an active microphone.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/mute-participant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomName: props.connectionDetails.roomName,
+          identity: agentParticipant.identity,
+          trackSid: micTrack.trackSid,
+          muted: true
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Server returned ' + response.status);
+      }
+      alert('Agent muted successfully.');
+    } catch (error) {
+      console.error('Error muting agent:', error);
+      alert('Failed to mute agent.');
+    }
+  }, [room, selectedAgent, props.connectionDetails.roomName]);
 
   return (
     <div className="lk-room-container" style={{ position: 'relative' }}>
@@ -285,6 +326,15 @@ function VideoConferenceComponent(props: {
           >
             {isInviting ? 'Summoning...' : 'Summon'}
           </button>
+          {props.isHost && (
+            <button 
+              className="flowgentic-btn" 
+              onClick={handleMuteAgent}
+              style={{ padding: '0.4rem 1.2rem', fontSize: '0.85rem', background: 'rgba(220, 53, 69, 0.8)' }}
+            >
+              Mute Agent
+            </button>
+          )}
         </div>
         <KeyboardShortcuts />
         <VideoConference
