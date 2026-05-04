@@ -258,7 +258,11 @@ function VideoConferenceComponent(props: {
   }, [props.connectionDetails.roomName, selectedAgent]);
 
   const handleMuteAgent = React.useCallback(async () => {
-    const agentParticipant = Array.from(room.remoteParticipants.values()).find(p => p.identity.includes(selectedAgent) || p.name === selectedAgent);
+    const agentParticipant = Array.from(room.remoteParticipants.values()).find(p => 
+      p.kind === 'agent' || 
+      p.identity.toLowerCase().includes('agent') || 
+      (p.name && p.name.toLowerCase().includes('agent'))
+    );
     if (!agentParticipant) {
       alert('Agent is not currently in the room.');
       return;
