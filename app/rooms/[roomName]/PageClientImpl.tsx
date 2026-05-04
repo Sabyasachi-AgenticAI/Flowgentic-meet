@@ -258,21 +258,25 @@ function VideoConferenceComponent(props: {
   }, [props.connectionDetails.roomName, selectedAgent]);
 
   const handleMuteAgent = React.useCallback(async () => {
-    const agentParticipant = Array.from(room.remoteParticipants.values()).find(p => 
+    const participants = Array.from(room.remoteParticipants.values());
+    const agentParticipant = participants.find(p => 
       p.kind === 'agent' || 
       p.identity.toLowerCase().includes('agent') || 
       (p.name && p.name.toLowerCase().includes('agent'))
     );
+    
     if (!agentParticipant) {
-      alert('Agent is not currently in the room.');
+      const names = participants.map(p => p.identity).join(', ');
+      alert(`Agent not found in the room. Available identities: ${names || 'None'}`);
       return;
     }
     
-    const micTrack = agentParticipant.getTrackPublication(Track.Source.Microphone);
-    if (!micTrack) {
-      alert('Agent does not have an active microphone.');
+    const audioTracks = Array.from(agentParticipant.audioTrackPublications.values());
+    if (audioTracks.length === 0) {
+      alert(`Agent (${agentParticipant.identity}) does not have an active audio track.`);
       return;
     }
+    const micTrack = audioTracks[0];
 
     try {
       const response = await fetch('/api/mute-participant', {
