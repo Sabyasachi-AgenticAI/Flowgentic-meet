@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const API_KEY = process.env.LIVEKIT_API_KEY;
 const API_SECRET = process.env.LIVEKIT_API_SECRET;
 const LIVEKIT_URL = process.env.LIVEKIT_URL;
-const DEFAULT_AGENT_NAME = process.env.LIVEKIT_AGENT_NAME || 'Riley-2252';
+const DEFAULT_AGENT_NAME = process.env.LIVEKIT_AGENT_NAME || 'my-agent';
 
 export async function POST(request: NextRequest) {
   try {

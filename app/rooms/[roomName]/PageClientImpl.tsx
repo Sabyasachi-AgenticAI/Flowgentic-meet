@@ -224,7 +224,7 @@ function VideoConferenceComponent(props: {
     }
   }, [lowPowerMode]);
 
-  const [selectedAgent, setSelectedAgent] = React.useState('Riley-2252');
+  const [selectedAgent, setSelectedAgent] = React.useState('my-agent');
   const [isInviting, setIsInviting] = React.useState(false);
   
   const handleInviteAgent = React.useCallback(async () => {
@@ -272,7 +272,7 @@ function VideoConferenceComponent(props: {
             onChange={(e) => setSelectedAgent(e.target.value)}
             style={{ background: 'transparent', color: 'white', border: 'none', padding: '0.2rem 0.5rem', cursor: 'pointer', outline: 'none' }}
           >
-            <option value="Riley-2252">Riley (Voice)</option>
+            <option value="my-agent">My Agent (Voice)</option>
             <option value="Samantha">Samantha (Meeting Assistant)</option>
             <option value="Jarvis">Jarvis (Tech Expert)</option>
             <option value="Nova">Nova (Creative Lead)</option>
