@@ -29,6 +29,7 @@ import {
 } from 'livekit-client';
 import { useRouter } from 'next/navigation';
 import { useSetupE2EE } from '@/lib/useSetupE2EE';
+import { AdminPanel } from './AdminPanel';
 import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
 
 const CONN_DETAILS_ENDPOINT =
@@ -257,48 +258,6 @@ function VideoConferenceComponent(props: {
     }
   }, [props.connectionDetails.roomName, selectedAgent]);
 
-  const handleMuteAgent = React.useCallback(async () => {
-    const participants = Array.from(room.remoteParticipants.values());
-    const agentParticipant = participants.find(p => 
-      p.identity.toLowerCase().includes('agent') || 
-      (p.name && p.name.toLowerCase().includes('agent'))
-    );
-    
-    if (!agentParticipant) {
-      const names = participants.map(p => p.identity).join(', ');
-      alert(`Agent not found in the room. Available identities: ${names || 'None'}`);
-      return;
-    }
-    
-    const audioTracks = Array.from(agentParticipant.audioTrackPublications.values());
-    if (audioTracks.length === 0) {
-      alert(`Agent (${agentParticipant.identity}) does not have an active audio track.`);
-      return;
-    }
-    const micTrack = audioTracks[0];
-
-    try {
-      const response = await fetch('/api/mute-participant', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roomName: props.connectionDetails.roomName,
-          identity: agentParticipant.identity,
-          trackSid: micTrack.trackSid,
-          muted: true
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Server returned ' + response.status);
-      }
-      alert('Agent muted successfully.');
-    } catch (error) {
-      console.error('Error muting agent:', error);
-      alert('Failed to mute agent.');
-    }
-  }, [room, selectedAgent, props.connectionDetails.roomName]);
-
   return (
     <div className="lk-room-container" style={{ position: 'relative' }}>
       <RoomContext.Provider value={room}>
@@ -334,21 +293,16 @@ function VideoConferenceComponent(props: {
           >
             {isInviting ? 'Summoning...' : 'Summon'}
           </button>
-          {props.isHost && (
-            <button 
-              className="flowgentic-btn" 
-              onClick={handleMuteAgent}
-              style={{ padding: '0.4rem 1.2rem', fontSize: '0.85rem', background: 'rgba(220, 53, 69, 0.8)' }}
-            >
-              Mute Agent
-            </button>
-          )}
         </div>
         <KeyboardShortcuts />
+        
         <VideoConference
           chatMessageFormatter={formatChatMessageLinks}
           SettingsComponent={SHOW_SETTINGS_MENU ? SettingsMenu : undefined}
         />
+        
+        {props.isHost && <AdminPanel roomName={props.connectionDetails.roomName} />}
+        
         <DebugMode />
         <RecordingIndicator />
       </RoomContext.Provider>
