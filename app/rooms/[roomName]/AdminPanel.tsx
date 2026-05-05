@@ -11,7 +11,7 @@ export function AdminPanel({ roomName }: AdminPanelProps) {
   const room = useRoomContext();
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const handleMute = async (identity: string) => {
+  const toggleMute = async (identity: string, isCurrentlyMuted: boolean) => {
     const participant = participants.find(p => p.identity === identity);
     if (!participant) return;
 
@@ -31,7 +31,7 @@ export function AdminPanel({ roomName }: AdminPanelProps) {
           roomName,
           identity: participant.identity,
           trackSid: micTrack.trackSid,
-          muted: true
+          muted: !isCurrentlyMuted
         })
       });
       
@@ -39,9 +39,29 @@ export function AdminPanel({ roomName }: AdminPanelProps) {
         throw new Error('Server returned ' + response.status);
       }
     } catch (error) {
-      console.error('Error muting participant:', error);
-      alert('Failed to mute participant.');
+      console.error('Error toggling mute:', error);
+      alert('Failed to unmute. Please ensure "Enable remote unmute" is turned on in your LiveKit Dashboard.');
     }
+  };
+
+  const muteAllHumans = async () => {
+    const humans = participants.filter(p => p.kind !== 'agent' && !p.identity.toLowerCase().includes('agent') && !p.isLocal);
+    for (const h of humans) {
+      const audioTracks = Array.from(h.audioTrackPublications.values());
+      if (audioTracks.length > 0) {
+        await fetch('/api/mute-participant', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomName,
+            identity: h.identity,
+            trackSid: audioTracks[0].trackSid,
+            muted: true
+          })
+        });
+      }
+    }
+    alert('Muted all human participants.');
   };
 
   return (
@@ -57,6 +77,13 @@ export function AdminPanel({ roomName }: AdminPanelProps) {
         <div style={{ position: 'absolute', bottom: '3rem', left: '0', background: 'rgba(15, 23, 42, 0.95)', border: '1px solid #334155', borderRadius: '0.75rem', padding: '1rem', width: '300px', backdropFilter: 'blur(10px)' }}>
           <h3 style={{ color: 'white', marginTop: 0, marginBottom: '1rem', fontSize: '1rem' }}>Admin Panel</h3>
 
+          <button 
+            onClick={muteAllHumans}
+            style={{ width: '100%', background: '#dc2626', color: 'white', border: 'none', padding: '0.4rem', borderRadius: '0.5rem', marginBottom: '1rem', cursor: 'pointer' }}
+          >
+            Mute All Humans
+          </button>
+
           <div style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {participants.map(p => {
               if (p.isLocal) return null; // Don't show host
@@ -70,11 +97,10 @@ export function AdminPanel({ roomName }: AdminPanelProps) {
                     {p.identity} {isAgent && '(AI)'}
                   </span>
                   <button 
-                    onClick={() => handleMute(p.identity)}
-                    disabled={isMuted}
-                    style={{ background: isMuted ? 'transparent' : '#f59e0b', color: isMuted ? '#64748b' : 'white', border: isMuted ? '1px solid #64748b' : 'none', padding: '0.2rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.75rem', cursor: isMuted ? 'not-allowed' : 'pointer' }}
+                    onClick={() => toggleMute(p.identity, isMuted)}
+                    style={{ background: isMuted ? '#10b981' : '#f59e0b', color: 'white', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.75rem', cursor: 'pointer' }}
                   >
-                    {isMuted ? 'Muted' : 'Mute'}
+                    {isMuted ? 'Unmute' : 'Mute'}
                   </button>
                 </div>
               );
