@@ -260,7 +260,6 @@ function VideoConferenceComponent(props: {
   const handleMuteAgent = React.useCallback(async () => {
     const participants = Array.from(room.remoteParticipants.values());
     const agentParticipant = participants.find(p => 
-      p.kind === 'agent' || 
       p.identity.toLowerCase().includes('agent') || 
       (p.name && p.name.toLowerCase().includes('agent'))
     );
