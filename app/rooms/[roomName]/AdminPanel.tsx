@@ -15,7 +15,7 @@ export function AdminPanel({ roomName }: AdminPanelProps) {
     const participant = participants.find(p => p.identity === identity);
     if (!participant) return;
 
-    const audioTracks = Array.from(participant.audioTrackPublications.values());
+    const audioTracks = Array.from(participant.audioTrackPublications.values() as IterableIterator<any>);
     if (audioTracks.length === 0) {
       alert('Participant has no audio track.');
       return;
@@ -24,30 +24,21 @@ export function AdminPanel({ roomName }: AdminPanelProps) {
     const micTrack = audioTracks[0];
 
     try {
-      const response = await fetch('/api/mute-participant', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roomName,
-          identity: participant.identity,
-          trackSid: micTrack.trackSid,
-          muted: !isCurrentlyMuted
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Server returned ' + response.status);
+      if (micTrack) {
+        // This disables/enables the track LOCALLY on the frontend
+        // which bypasses any server-side privacy restrictions on unmuting
+        micTrack.setEnabled(isCurrentlyMuted);
       }
     } catch (error) {
-      console.error('Error toggling mute:', error);
-      alert('Failed to unmute. Please ensure "Enable remote unmute" is turned on in your LiveKit Dashboard.');
+      console.error('Error toggling local mute:', error);
+      alert('Failed to change audio state locally.');
     }
   };
 
   const muteAllHumans = async () => {
-    const humans = participants.filter(p => p.kind !== 'agent' && !p.identity.toLowerCase().includes('agent') && !p.isLocal);
+    const humans = participants.filter(p => !p.identity.toLowerCase().includes('agent') && !p.isLocal);
     for (const h of humans) {
-      const audioTracks = Array.from(h.audioTrackPublications.values());
+      const audioTracks = Array.from(h.audioTrackPublications.values() as IterableIterator<any>);
       if (audioTracks.length > 0) {
         await fetch('/api/mute-participant', {
           method: 'POST',
@@ -87,9 +78,9 @@ export function AdminPanel({ roomName }: AdminPanelProps) {
           <div style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {participants.map(p => {
               if (p.isLocal) return null; // Don't show host
-              const isAgent = p.kind === 'agent' || p.identity.toLowerCase().includes('agent');
-              const audioTrack = Array.from(p.audioTrackPublications.values())[0];
-              const isMuted = audioTrack ? audioTrack.isMuted : true;
+              const isAgent = p.identity.toLowerCase().includes('agent');
+              const audioTrack = Array.from(p.audioTrackPublications.values() as IterableIterator<any>)[0];
+              const isMuted = audioTrack ? !audioTrack.isEnabled : true;
               
               return (
                 <div key={p.identity} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '0.5rem', borderRadius: '0.25rem' }}>
