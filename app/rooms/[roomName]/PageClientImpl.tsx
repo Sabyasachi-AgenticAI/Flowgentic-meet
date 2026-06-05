@@ -102,6 +102,20 @@ export function PageClientImpl(props: {
   );
 }
 
+const customChatMessageFormatter = (message: string) => {
+  const match = message.match(/^([^:]+):\s*(.*)/s);
+  if (match) {
+    const [, sender, text] = match;
+    return (
+      <>
+        <strong className="chat-sender-prefix">{sender}:</strong>
+        {formatChatMessageLinks(text)}
+      </>
+    );
+  }
+  return formatChatMessageLinks(message);
+};
+
 function VideoConferenceComponent(props: {
   userChoices: LocalUserChoices;
   connectionDetails: ConnectionDetails;
@@ -297,7 +311,7 @@ function VideoConferenceComponent(props: {
         <KeyboardShortcuts />
         
         <VideoConference
-          chatMessageFormatter={formatChatMessageLinks}
+          chatMessageFormatter={customChatMessageFormatter}
           SettingsComponent={SHOW_SETTINGS_MENU ? SettingsMenu : undefined}
         />
         

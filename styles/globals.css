@@ -318,3 +318,14 @@ footer a:hover {
   background: var(--primary-hover);
   box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
 }
+
+/* Custom chat prefix and remote header styling */
+.lk-chat-entry[data-lk-message-origin="remote"] .lk-meta-data {
+  display: none !important;
+}
+
+.chat-sender-prefix {
+  font-weight: 700;
+  color: #a78bfa; /* light purple accent */
+  margin-right: 0.35rem;
+}
