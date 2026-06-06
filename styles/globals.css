@@ -275,6 +275,32 @@ footer a:hover {
   z-index: 10 !important;
 }
 
+/* Per-Agent Avatar Styles */
+.lk-participant-tile[data-lk-participant-name*="Tom"] .lk-avatar,
+.lk-participant-tile[data-lk-participant-name*="Tom"] .lk-participant-placeholder {
+  background-image: url('/images/tom.png') !important;
+}
+
+.lk-participant-tile[data-lk-participant-name*="Priya"] .lk-avatar,
+.lk-participant-tile[data-lk-participant-name*="Priya"] .lk-participant-placeholder {
+  background-image: url('/images/priya.png') !important;
+}
+
+.lk-participant-tile[data-lk-participant-name*="Alex"] .lk-avatar,
+.lk-participant-tile[data-lk-participant-name*="Alex"] .lk-participant-placeholder {
+  background-image: url('/images/alex.png') !important;
+}
+
+.lk-participant-tile[data-lk-participant-name*="Marcus"] .lk-avatar,
+.lk-participant-tile[data-lk-participant-name*="Marcus"] .lk-participant-placeholder {
+  background-image: url('/images/marcus.png') !important;
+}
+
+.lk-participant-tile[data-lk-participant-name*="Diana"] .lk-avatar,
+.lk-participant-tile[data-lk-participant-name*="Diana"] .lk-participant-placeholder {
+  background-image: url('/images/diana.png') !important;
+}
+
 /* Hide the blank video/initials for all agents */
 .lk-participant-tile[data-lk-participant-name*="agent-"] .lk-participant-media-video,
 .lk-participant-tile[data-lk-participant-name*="agent-"] video,
