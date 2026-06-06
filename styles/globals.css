@@ -260,7 +260,7 @@ footer a:hover {
 .lk-participant-tile[data-lk-participant-identity*="agent-"] .lk-avatar,
 .lk-participant-tile[data-lk-participant-name*="Riley"] .lk-avatar,
 .lk-participant-tile[data-lk-participant-identity*="Riley"] .lk-avatar {
-  background-image: url('/images/riley.png') !important;
+  background-image: url('/images/flowgentic-agent.png') !important;
   background-size: cover !important;
   background-position: center !important;
   background-color: var(--bg-dark) !important;
