@@ -1,0 +1,41 @@
+[
+  {
+    "id": "95542484-a50b-4587-999a-a682c3fe7cad",
+    "name": "FlowSync",
+    "key": "FLO",
+    "states": {
+      "nodes": [
+        {
+          "id": "c6b12d93-bfb0-4f62-a8d0-e3ab7b75d06d",
+          "name": "Duplicate",
+          "type": "duplicate"
+        },
+        {
+          "id": "49d8e1fd-69dc-4339-a8d7-f5cf48d61b7f",
+          "name": "Canceled",
+          "type": "canceled"
+        },
+        {
+          "id": "3d4308f2-b85f-42de-9241-eec2379c11f5",
+          "name": "Done",
+          "type": "completed"
+        },
+        {
+          "id": "3862f813-640e-4a02-bcd5-fdc99c564940",
+          "name": "Todo",
+          "type": "unstarted"
+        },
+        {
+          "id": "2e31fea4-5438-464c-ab7d-853aabf3d8ed",
+          "name": "In Progress",
+          "type": "started"
+        },
+        {
+          "id": "0f45246b-dbeb-4414-8a50-c0c0bd881157",
+          "name": "Backlog",
+          "type": "backlog"
+        }
+      ]
+    }
+  }
+]
