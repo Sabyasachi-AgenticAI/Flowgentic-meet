@@ -37,6 +37,7 @@ class TomAgent(GenericAgent):
             greeting_time = "afternoon"
         else:
             greeting_time = "evening"
+        self.greeting_time = greeting_time
 
         instructions = f"""
         Your name is Tom. You are the Chief of Staff at NexaCore Inc.
@@ -78,6 +79,31 @@ class TomAgent(GenericAgent):
             ),
             first_time=first_time,
         )
+
+    async def on_enter(self):
+        # Gather all remote participant names
+        participant_names = []
+        if hasattr(self.session, "room") and self.session.room:
+            for p in self.session.room.remote_participants.values():
+                name = p.name or p.identity
+                if name:
+                    participant_names.append(name)
+
+        if participant_names:
+            # Format with break tags for voice pacing
+            names_str = ", <break time=\"300ms\"/> ".join(participant_names)
+            greeting_phrase = f"Good {self.greeting_time} {names_str}. Thank you for joining this meeting."
+        else:
+            greeting_phrase = f"Good {self.greeting_time} everyone. Thank you for joining this meeting."
+
+        target_str = f'greet all human participants in the room enthusiastically with "Good {self.greeting_time}" (e.g., "Good {self.greeting_time} everyone" or "Good {self.greeting_time} Sabya").'
+        replacement_str = f'greet them enthusiastically with exactly: "{greeting_phrase}".'
+
+        self.instructions = self.instructions.replace(target_str, replacement_str)
+        logger.info(f"TomAgent dynamically set greeting to: {greeting_phrase}")
+
+        await super().on_enter()
+
 
     @function_tool
     async def bring_in_priya(self):
