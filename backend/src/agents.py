@@ -57,9 +57,10 @@ class TomAgent(GenericAgent):
         - Once the user speaks and calls you in, greet all human participants in the room enthusiastically with "Good {greeting_time}" (e.g., "Good {greeting_time} everyone" or "Good {greeting_time} Sabya"). Let's get right to it—we are six weeks from launch and we have got some crucial workstreams and topics to lock in today. State that you have a full status report, mention that Priya has surfaced a critical scope issue regarding SSO that we need to resolve immediately, and ask if you should bring her in to discuss it now.
         - If the user greets you again later or says hello, greet them back in an enthusiastic, credible, and professional manner, ask how they are, and ask if they are ready to dive straight into the FlowSync launch status.
         - Proactive Backlog Routing: If the user asks about the agenda/backlog, or agrees to discuss product scope, state with confidence that Priya has surfaced a critical scope issue regarding SSO that we need to resolve immediately, and ask if you should bring her in to discuss it now. Only call the bring_in_priya tool if the user agrees or requests to discuss product scope, manage the backlog, or talk to Priya.
+        - Proactive Compliance Routing: Never bring in Alex for compliance issues. If the user or another agent mentions compliance, GDPR, or AI Act review, you MUST bring in Diana (bring_in_diana), not Alex. Under no circumstances should you suggest Alex or call bring_in_alex for compliance questions.
         - You know Priya handles product scope and backlog, Alex handles sprint execution, Marcus handles go-to-market, and Diana handles compliance.
         - When transitioning between agents, passionately acknowledge what just happened, highlight its impact, and smoothly route to the next person with high energy.
-        - Proactive Compliance Routing: If Marcus hands back to you and flags compliance check issues, take immediate accountability for this risk, state that we must resolve compliance with Diana right now, and call bring_in_diana to connect them. Do not wait for the user to ask.
+        - Proactive Compliance Routing Tool: If Marcus hands back to you and flags compliance check issues, take immediate accountability for this risk, state that we must resolve compliance with Diana right now, and call bring_in_diana to connect them. Do not wait for the user to ask.
         - When asked to close the meeting, summarize all decisions made during the meeting with clear accountability, highlighting next steps, before ending.
 
         Voice Output Rules:
@@ -73,7 +74,7 @@ class TomAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-2-orion-en",
+                model="aura-orion-en",
             ),
             first_time=first_time,
         )
@@ -135,7 +136,7 @@ class PriyaAgent(GenericAgent):
         Never ask "How can I help you?" or "How can I assist?". You are a colleague in a war room, not a customer support helper.
         Your job is to create, find, archive, and reprioritize tickets.
         You NEVER move ticket states (e.g., to In Progress or Done)—that is Alex's job.
-        If the user asks to move a ticket, explain that only Alex (the Scrum Master) can do that, and offer to return to Tom or connect them to Alex.
+        If the user asks to move a ticket, explain that only Alex (the Scrum Master) can do that. If they ask about compliance, GDPR, the AI Act, or any regulatory/legal issues, explain that you handle product scope and backlog only, and that Tom should bring in Diana (our Compliance Officer). Under no circumstances should you suggest Alex or transition to Alex for compliance queries. Proactively call return_to_tom to hand back to Tom so he can route them correctly.
         When you are done with backlog tasks, proactively hand back to Tom by calling return_to_tom.
 
         Demo Context:
@@ -157,7 +158,7 @@ class PriyaAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-2-luna-en",
+                model="aura-luna-en",
             ),
         )
 
@@ -353,7 +354,7 @@ class AlexAgent(GenericAgent):
         Your job is to move existing tickets (to In Progress, Done, or Backlog) and report on sprint status.
         You NEVER create tickets—that is Priya's job.
         If the user asks to create a ticket, explain that only Priya (the Product Manager) can do that, and offer to return to Tom or connect them to Priya.
-        When you are done with ticket updates, proactively hand back to Tom by calling return_to_tom.
+        If the user asks about compliance, GDPR, the AI Act, or regulatory topics, explain that you only handle sprint status and execution, and that Tom should bring in Diana (our Compliance Officer). Never suggest that you handle compliance or regulatory issues, and never suggest that Tom bring you in for compliance. Proactively call return_to_tom to hand back control to Tom.
 
         Demo Context:
         - The product is FlowSync by NexaCore Inc. Launch is in six weeks.
@@ -372,7 +373,7 @@ class AlexAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-2-perseus-en",
+                model="aura-perseus-en",
             ),
         )
 
@@ -722,7 +723,7 @@ class MarcusAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-2-helios-en",
+                model="aura-helios-en",
             ),
         )
 
@@ -1045,7 +1046,7 @@ class DianaAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-2-stella-en",
+                model="aura-stella-en",
             ),
         )
 
