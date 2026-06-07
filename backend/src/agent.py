@@ -15,7 +15,7 @@ from livekit.agents import (
     UserInputTranscribedEvent,
     ConversationItemAddedEvent,
 )
-from livekit.plugins import ai_coustics, cartesia, deepgram, silero
+from livekit.plugins import ai_coustics, deepgram, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from slide_presenter import SlidePresenter
 
@@ -67,9 +67,7 @@ async def my_agent(ctx: JobContext):
     # Set up the standard Voice Pipeline (STT -> LLM -> TTS)
     session = AgentSession(
         stt=deepgram.STT(model="nova-3", language="en-US"),
-        tts=cartesia.TTS(
-            voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc",
-        ),
+        tts=deepgram.TTS(),
         turn_detection=MultilingualModel(),
         vad=ctx.proc.userdata["vad"],
         preemptive_generation=True,
@@ -138,7 +136,7 @@ async def my_agent(ctx: JobContext):
 
     # Start the session, initializing with the Chief of Staff agent (Tom)
     await session.start(
-        agent=TomAgent(),
+        agent=TomAgent(first_time=True),
         room=ctx.room,
         room_options=room_io.RoomOptions(
             audio_input=room_io.AudioInputOptions(

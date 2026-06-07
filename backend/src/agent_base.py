@@ -1,7 +1,7 @@
 import logging
 import textwrap
-from livekit.agents import Agent, ChatContext
-from livekit.plugins import cartesia, openai
+from livekit.agents import Agent, ChatContext, tts
+from livekit.plugins import openai
 
 logger = logging.getLogger("agent")
 
@@ -10,8 +10,9 @@ class GenericAgent(Agent):
     """Base class for our specialized agents to share common LLM setup and lifecycle behavior."""
 
     def __init__(
-        self, instructions: str, chat_ctx: ChatContext = None, tts: cartesia.TTS = None
+        self, instructions: str, chat_ctx: ChatContext = None, tts: tts.TTS = None, first_time: bool = False
     ) -> None:
+        self.first_time = first_time
         super().__init__(
             llm=openai.LLM(model="gpt-4o"),
             instructions=textwrap.dedent(instructions),
@@ -33,4 +34,8 @@ class GenericAgent(Agent):
                 logger.error(f"Failed to update participant name: {e}")
 
         # Automatically trigger speech when an agent takes control (e.g. greets the user)
-        self.session.generate_reply()
+        if self.first_time:
+            logger.info("First time enter: waiting for user to speak first.")
+            self.first_time = False
+        else:
+            self.session.generate_reply()

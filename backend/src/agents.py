@@ -8,7 +8,7 @@ import textwrap
 from livekit import api
 from livekit.agents import ChatContext, function_tool
 from livekit.agents.job import get_job_context
-from livekit.plugins import cartesia
+from livekit.plugins import deepgram
 
 from agent_base import GenericAgent
 from api_helpers import (
@@ -28,8 +28,17 @@ logger = logging.getLogger("agent")
 class TomAgent(GenericAgent):
     """Tom — Chief of Staff. Orchestrates the meeting, routes tasks, and keeps the meeting moving."""
 
-    def __init__(self, chat_ctx: ChatContext = None) -> None:
-        instructions = """
+    def __init__(self, chat_ctx: ChatContext = None, first_time: bool = False) -> None:
+        import datetime
+        hour = datetime.datetime.now().hour
+        if hour < 12:
+            greeting_time = "morning"
+        elif hour < 17:
+            greeting_time = "afternoon"
+        else:
+            greeting_time = "evening"
+
+        instructions = f"""
         Your name is Tom. You are the Chief of Staff at NexaCore Inc.
         You are leading this pre-launch war room meeting for FlowSync. You are an energetic, sharp, and highly credible partner to Sabya. You take absolute ownership and accountability for the coordination of this launch meeting.
         Never ask "How can I help you?" or "How can I assist?". Instead, proactively drive the agenda with momentum and authority.
@@ -44,8 +53,9 @@ class TomAgent(GenericAgent):
 
         Demo Context:
         - We are NexaCore Inc. The product is FlowSync. We are six weeks from launch.
-        - When you first enter the room, greet Sabya immediately with enthusiasm and energy: "Good morning Sabya! Let's get right to it—we are six weeks from launch and we have got some crucial workstreams to lock in today. I have got a full status report and I am ready to drive this home." Do not wait for him to speak first.
-        - If the user greets you (e.g. says "Hello" or "hi"), greet them back in an enthusiastic, credible, and professional manner, ask how they are, and ask if they are ready to dive straight into the FlowSync launch status.
+        - Greet Flow: Do not speak immediately when you enter the room. Wait for the user to speak first and call you in.
+        - Once the user speaks and calls you in, greet all human participants in the room enthusiastically with "Good {greeting_time}" (e.g., "Good {greeting_time} everyone" or "Good {greeting_time} Sabya"). Then explain that we are six weeks from launch and we have got crucial workstreams and topics to lock in today. Mention that we have a full status report, and ask what the plans are for the launch.
+        - If the user greets you again later or says hello, greet them back in an enthusiastic, credible, and professional manner, ask how they are, and ask if they are ready to dive straight into the FlowSync launch status.
         - Proactive Backlog Routing: If the user is ready to begin or asks about the agenda/backlog, state with confidence that Priya has surfaced a critical scope issue regarding SSO that we need to resolve immediately, and ask if you should bring her in to discuss it now. Only call the bring_in_priya tool if the user agrees or requests to discuss product scope, manage the backlog, or talk to Priya.
         - You know Priya handles product scope and backlog, Alex handles sprint execution, Marcus handles go-to-market, and Diana handles compliance.
         - When transitioning between agents, passionately acknowledge what just happened, highlight its impact, and smoothly route to the next person with high energy.
@@ -62,9 +72,10 @@ class TomAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=cartesia.TTS(
-                voice="a5136bf9-224c-4d76-b823-52bd5efcffcc",  # Jameson (Stable Agent Male)
+            tts=deepgram.TTS(
+                model="aura-2-orion-en",
             ),
+            first_time=first_time,
         )
 
     @function_tool
@@ -145,8 +156,8 @@ class PriyaAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=cartesia.TTS(
-                voice="db6b0ed5-d5d3-463d-ae85-518a07d3c2b4",  # Sophie (Warm/Friendly Female)
+            tts=deepgram.TTS(
+                model="aura-2-luna-en",
             ),
         )
 
@@ -360,8 +371,8 @@ class AlexAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=cartesia.TTS(
-                voice="63ff761e-09de-4fcc-87de-f13191384b22",  # Grant (Steady, Clear Male)
+            tts=deepgram.TTS(
+                model="aura-2-perseus-en",
             ),
         )
 
@@ -710,8 +721,8 @@ class MarcusAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=cartesia.TTS(
-                voice="820a3788-2b37-4d21-847a-b65d8a68c99a",  # Tyler (Friendly Salesman)
+            tts=deepgram.TTS(
+                model="aura-2-helios-en",
             ),
         )
 
@@ -1033,8 +1044,8 @@ class DianaAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=cartesia.TTS(
-                voice="f786b574-daa5-4673-aa0c-cbe3e8534c02",  # Diana (Animated Narrator)
+            tts=deepgram.TTS(
+                model="aura-2-stella-en",
             ),
         )
 
