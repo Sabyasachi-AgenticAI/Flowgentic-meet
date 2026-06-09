@@ -9,6 +9,8 @@
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --accent-glow: radial-gradient(circle at 50% -20%, rgba(139, 92, 246, 0.15), transparent 70%);
+  --lk-accent-color: #8b5cf6 !important;
+  --lk-accent-bg: rgba(139, 92, 246, 0.1) !important;
 }
 
 * {
@@ -345,13 +347,66 @@ footer a:hover {
   box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
 }
 
-/* Custom chat prefix and remote header styling */
+/* Custom chat overrides & layout */
+
+/* Remove pink theme variables from LiveKit components */
+.lk-chat-entry-author {
+  color: #38bdf8 !important; /* light blue instead of pink */
+  font-weight: 600 !important;
+}
+
+.lk-meta-data {
+  color: var(--text-muted) !important;
+}
+
+/* Zig-zag chat bubbles styling */
+.lk-chat-entry {
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 80% !important;
+  margin-bottom: 0.85rem !important;
+  border-radius: 1rem !important;
+  padding: 0.75rem 1rem !important;
+  line-height: 1.4 !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Local User (Me) -> Right side */
+.lk-chat-entry[data-lk-message-origin="local"] {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  background-color: rgba(139, 92, 246, 0.2) !important; /* Premium semi-transparent purple */
+  border: 1px solid rgba(139, 92, 246, 0.35) !important;
+  border-bottom-right-radius: 0.25rem !important;
+  align-items: flex-end !important;
+  text-align: right !important;
+}
+
+/* Remote Users/Agents -> Left side */
+.lk-chat-entry[data-lk-message-origin="remote"] {
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  background-color: rgba(255, 255, 255, 0.04) !important; /* Glassmorphic dark card */
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom-left-radius: 0.25rem !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+}
+
+/* Hide remote metadata entirely since we parse sender name inline */
 .lk-chat-entry[data-lk-message-origin="remote"] .lk-meta-data {
   display: none !important;
 }
 
-.chat-sender-prefix {
+/* Set local user and remote agent prefix colors cleanly */
+.lk-chat-entry[data-lk-message-origin="local"] .chat-sender-prefix {
+  color: #c084fc !important; /* soft purple/magenta for local user */
   font-weight: 700;
-  color: #a78bfa; /* light purple accent */
+  margin-right: 0.35rem;
+}
+
+.lk-chat-entry[data-lk-message-origin="remote"] .chat-sender-prefix {
+  color: #38bdf8 !important; /* clean light blue for agents */
+  font-weight: 700;
   margin-right: 0.35rem;
 }

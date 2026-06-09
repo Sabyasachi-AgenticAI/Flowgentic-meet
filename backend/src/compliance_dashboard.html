@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NexaCore FlowSync - Compliance & Privacy Control Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0d19;
+            --card-bg: rgba(20, 24, 45, 0.7);
+            --border-color: rgba(139, 92, 246, 0.3);
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --text-primary: #ffffff;
+            --text-secondary: #9ca3af;
+            --status-critical: #ef4444;
+            --status-warning: #f59e0b;
+            --status-pass: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            padding: 40px;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top right, rgba(139, 92, 246, 0.15), transparent 400px),
+                              radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.1), transparent 400px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header-title h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .badge {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--accent-purple);
+            color: #c084fc;
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .audit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .audit-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .audit-item:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.02);
+            transform: translateY(-2px);
+        }
+
+        .audit-details {
+            padding-right: 15px;
+        }
+
+        .audit-details h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .audit-details p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .status-pill {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .status-pill.critical {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+        }
+
+        .status-pill.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .status-pill.pass {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .news-item {
+            border-left: 3px solid var(--accent-cyan);
+            padding-left: 14px;
+            margin-bottom: 4px;
+        }
+
+        .news-item h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .news-item p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .news-item span {
+            font-size: 11px;
+            color: var(--accent-cyan);
+            display: block;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            <h1>NexaCore FlowSync</h1>
+            <p>Compliance & Privacy Control Center</p>
+        </div>
+        <div class="badge">Scope: October 14 Launch</div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="card-header">
+                <h2>Active Audit Risks</h2>
+                <span class="status-pill critical">2 Issues Flagged</span>
+            </div>
+            <div class="audit-list">
+                <div class="audit-item">
+                    <div class="audit-details">
+                        <h3>GDPR Onboarding Consent Gap</h3>
+                        <p>User consent checkboxes and data collection telemetry policies are missing from the primary FlowSync signup pages. This violates General Data Protection Regulation Article 7 (Conditions for Consent).</p>
+                    </div>
+                    <span class="status-pill critical">Critical Blocker</span>
+                </div>
+                <div class="audit-item">
+                    <div class="audit-details">
+                        <h3>EU AI Act Compliance Review Guidelines</h3>
+                        <p>Classifier model telemetry and risk category evaluations for LLM features must be registered before private beta. Violates transparency rules under Article 52.</p>
+                    </div>
+                    <span class="status-pill warning">High Risk</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Advisory Alerts</h2>
+            </div>
+            <div class="news-list">
+                <div class="news-item">
+                    <h4>EU AI Act Enters Into Force</h4>
+                    <p>The comprehensive European Union regulations for artificial intelligence models are now active. Stricter transparency guidelines apply to high-risk models.</p>
+                    <span>Source: EU Publications Office</span>
+                </div>
+                <div class="news-item">
+                    <h4>EDPB Update on SaaS Telemetry</h4>
+                    <p>European Data Protection Board issued guidelines clarifying user tracking telemetry guidelines for SaaS onboarding interfaces.</p>
+                    <span>Source: EDPB Portal</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

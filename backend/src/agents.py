@@ -75,7 +75,7 @@ class TomAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-orion-en",
+                model="aura-2-orion-en",
             ),
             first_time=first_time,
         )
@@ -99,7 +99,7 @@ class TomAgent(GenericAgent):
         target_str = f'greet all human participants in the room enthusiastically with "Good {self.greeting_time}" (e.g., "Good {self.greeting_time} everyone" or "Good {self.greeting_time} Sabya").'
         replacement_str = f'greet them enthusiastically with exactly: "{greeting_phrase}".'
 
-        self.instructions = self.instructions.replace(target_str, replacement_str)
+        await self.update_instructions(self.instructions.replace(target_str, replacement_str))
         logger.info(f"TomAgent dynamically set greeting to: {greeting_phrase}")
 
         await super().on_enter()
@@ -173,6 +173,11 @@ class PriyaAgent(GenericAgent):
         - If Sabya agrees to add SSO back, you should create an SSO integration ticket (high priority) and archive the custom dashboard widget ticket (since it is not customer-facing at launch).
         - After completing those changes, confirm them and offer to hand back to Tom.
 
+        Presentation and Browsing Controls:
+        - If the user asks to see the backlog, look at the Linear board, or refers to the backlog board visually, immediately call show_linear_board to open the live browser screenshare view of the backlog. Tell the user you are sharing your screen.
+        - You can scroll through the backlog using scroll_browser.
+        - When you are done or before calling return_to_tom, you MUST call hide_linear_board to close the screenshare and browser session.
+
         Voice Output Rules:
         - Respond in plain text only. Never use JSON, markdown, lists, tables, code, emojis, or other complex formatting.
         - Keep replies brief by default: one to three sentences. Ask one question at a time.
@@ -184,7 +189,7 @@ class PriyaAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-luna-en",
+                model="aura-2-luna-en",
             ),
         )
 
@@ -360,6 +365,44 @@ class PriyaAgent(GenericAgent):
         return f"Ticket {linear_identifier} successfully archived in Linear."
 
     @function_tool
+    async def show_linear_board(self):
+        """Use this tool to start sharing your screen and bring up the Linear backlog board view."""
+        logger.info("Priya is starting Linear board screenshare")
+        if hasattr(self.session, "presenter") and self.session.presenter:
+            if not self.session.presenter.running:
+                await self.session.presenter.start()
+            res = await self.session.presenter.start_browser_session()
+            if "Error" in res:
+                return res
+            res = await self.session.presenter.browse_to("https://linear.app/")
+            click_res = await self.session.presenter.click_all_issues()
+            logger.info(f"Click 'All issues' result: {click_res}")
+            return res
+        return "Slide presenter is not available in this session."
+
+    @function_tool
+    async def hide_linear_board(self):
+        """Use this tool to close the Linear backlog board screenshare and stop sharing your screen."""
+        logger.info("Priya is closing Linear board screenshare")
+        if hasattr(self.session, "presenter") and self.session.presenter:
+            await self.session.presenter.stop_browser_session()
+            await self.session.presenter.stop()
+            return "Linear board screenshare closed successfully."
+        return "Slide presenter is not available in this session."
+
+    @function_tool
+    async def scroll_browser(self, direction: str):
+        """Use this tool to scroll the screenshared browser viewport up or down.
+        
+        Args:
+            direction: Either 'down' to scroll down or 'up' to scroll up.
+        """
+        if hasattr(self.session, "presenter") and self.session.presenter:
+            res = await self.session.presenter.scroll_browser(direction)
+            return res
+        return "Slide presenter is not available in this session."
+
+    @function_tool
     async def return_to_tom(self):
         """Call this function when you are finished managing the backlog and want to hand back control to Tom."""
         logger.info("Priya is handing back to Tom")
@@ -399,7 +442,7 @@ class AlexAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-perseus-en",
+                model="aura-2-perseus-en",
             ),
         )
 
@@ -733,7 +776,7 @@ class MarcusAgent(GenericAgent):
         - Proactively suggest creating a private beta invite ticket marked urgent, and offer to send an email to Axcelerate.
         - The email to Axcelerate should have subject: "Early access to FlowSync before October fourteenth."
         - Use the email address: partnerships@axcelerate.io.
-        - After completing GTM tasks, flag to Sabya that EU launch materials need a compliance check before the fourteenth, and immediately hand off directly to Diana by calling hand_off_to_diana.
+        - After completing GTM tasks, flag to Sabya that EU launch materials need a compliance check before the fourteenth, and return control to Tom by calling return_to_tom.
 
         Voice Output Rules:
         - Respond in plain text only. Never use JSON, markdown, lists, tables, code, emojis, or other complex formatting.
@@ -749,7 +792,7 @@ class MarcusAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-helios-en",
+                model="aura-2-helios-en",
             ),
         )
 
@@ -990,14 +1033,6 @@ class MarcusAgent(GenericAgent):
         return f"Slack message posted to {channel} successfully (mocked)."
 
     @function_tool
-    async def hand_off_to_diana(self):
-        """Call this function when you are finished GTM tasks and want to hand off control directly to Diana, our Compliance Officer, for the compliance check."""
-        logger.info("Marcus is handing off to Diana")
-        from agents import DianaAgent
-        diana_agent = DianaAgent(chat_ctx=self.chat_ctx)
-        return diana_agent, "Connecting you directly to Diana, our Compliance Officer."
-
-    @function_tool
     async def return_to_tom(self):
         """Call this function when you are finished with GTM tasks and want to hand back control to Tom."""
         logger.info("Marcus is handing back to Tom")
@@ -1058,7 +1093,7 @@ class DianaAgent(GenericAgent):
           2. EU AI Act compliance review guidelines.
         - Create both tickets, mark them urgent, and set both as blockers on the private beta invite ticket.
         - When entering, proactively raise both compliance issues. Start with the GDPR consent gap. Do not wait to be asked.
-        - Presentation and Browsing Controls: If the user asks you to look up or search for news or compliance guidelines regarding the EU AI Act or GDPR regulations, immediately call browse_regulation_news with the search query to open the live browser screenshare view. Tell the user you are sharing your screen. You can scroll through pages using scroll_browser. When done, call stop_browsing to close the browser screenshare.
+        - Presentation and Browsing Controls: If the user asks you to show the compliance status, dashboard, or overview of active audit risks, immediately call show_compliance_dashboard to open the live compliance control center on screenshare. If the user asks you to look up or search for news or compliance guidelines regarding the EU AI Act or GDPR regulations, call browse_regulation_news with the search query. Tell the user you are sharing your screen. You can scroll through pages using scroll_browser. When done, call stop_browsing to close the browser screenshare.
         - After completing compliance tasks, proactively hand back to Tom by calling return_to_tom.
 
         Voice Output Rules:
@@ -1072,7 +1107,7 @@ class DianaAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-stella-en",
+                model="aura-2-stella-en",
             ),
         )
 
@@ -1307,6 +1342,29 @@ class DianaAgent(GenericAgent):
         from agents import TomAgent
         tom_agent = TomAgent(chat_ctx=self.chat_ctx)
         return tom_agent, "Returning you to Tom."
+
+    @function_tool
+    async def show_compliance_dashboard(self):
+        """Use this tool to start sharing your screen and display the NexaCore FlowSync Compliance & Privacy Control Center dashboard."""
+        logger.info("Diana is starting compliance dashboard screenshare")
+        if hasattr(self.session, "presenter") and self.session.presenter:
+            # Start screen share if not already active
+            if not self.session.presenter.running:
+                await self.session.presenter.start()
+            
+            # Initialize playwright browser session if needed
+            res = await self.session.presenter.start_browser_session()
+            if "Error" in res:
+                return res
+            
+            # Navigate to the local compliance_dashboard.html file
+            import os
+            dashboard_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "compliance_dashboard.html"))
+            file_url = f"file:///{dashboard_path.replace(os.sep, '/')}"
+            logger.info(f"Diana navigating to dashboard url: {file_url}")
+            res = await self.session.presenter.browse_to(file_url)
+            return res
+        return "Slide presenter is not available in this session."
 
     @function_tool
     async def browse_regulation_news(self, query: str):

@@ -201,7 +201,13 @@ class SlidePresenter:
                     logger.warning(f"Failed to launch with chrome channel: {e_chrome}. Falling back to default chromium...")
                     self.browser = await self.playwright.chromium.launch(headless=True)
 
+            state_path = "linear_state.json"
+            storage_state = state_path if os.path.exists(state_path) else None
+            if storage_state:
+                logger.info(f"Loading Playwright storage state from: {state_path}")
+                
             self.browser_context = await self.browser.new_context(
+                storage_state=storage_state,
                 viewport={"width": self.width, "height": self.height},
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
                 locale="en-US",
@@ -258,6 +264,60 @@ class SlidePresenter:
         except Exception as e:
             logger.error(f"Failed to scroll page: {e}")
             return f"Error scrolling page: {e}"
+
+    async def click_all_issues(self) -> str:
+        """Clicks the 'All issues' tab on the Linear dashboard if available."""
+        if not self.page:
+            return "Error: Browser session is not active."
+        try:
+            # Give the page a moment to load and render elements
+            await asyncio.sleep(2)
+            # Try different locator strategies for the "All issues" tab
+            locators = [
+                self.page.get_by_text("All issues", exact=True),
+                self.page.get_by_text("All Issues", exact=True),
+                self.page.locator('button:has-text("All issues")'),
+                self.page.locator('div:has-text("All issues")'),
+                self.page.locator('a:has-text("All issues")'),
+                self.page.locator('[data-testid="all-issues-tab"]')
+            ]
+            for loc in locators:
+                try:
+                    count = await loc.count()
+                    for i in range(count):
+                        element = loc.nth(i)
+                        if await element.is_visible():
+                            await element.click()
+                            logger.info("Clicked 'All issues' tab successfully.")
+                            return "Clicked 'All issues' tab successfully."
+                except Exception as ex:
+                    logger.debug(f"Locator check failed: {ex}")
+            
+            # Fallback to JS evaluation to scan the DOM and click
+            clicked = await self.page.evaluate('''() => {
+                const elements = Array.from(document.querySelectorAll('*'));
+                for (const el of elements) {
+                    if (el.textContent && el.textContent.trim() === 'All issues') {
+                        el.click();
+                        return true;
+                    }
+                }
+                for (const el of elements) {
+                    if (el.textContent && el.textContent.trim().toLowerCase() === 'all issues') {
+                        el.click();
+                        return true;
+                    }
+                }
+                return false;
+            }''')
+            if clicked:
+                logger.info("Clicked 'All issues' via JS evaluation.")
+                return "Clicked 'All issues' tab via JS."
+            
+            return "Could not find 'All issues' tab to click."
+        except Exception as e:
+            logger.error(f"Failed during click_all_issues: {e}")
+            return f"Error clicking 'All issues': {e}"
 
     async def stop_browser_session(self) -> str:
         """Closes browser session."""
