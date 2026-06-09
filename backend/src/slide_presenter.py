@@ -233,7 +233,7 @@ class SlidePresenter:
             return "Error: Browser session is not active."
             
         url = query_or_url.strip()
-        if not (url.startswith("http://") or url.startswith("https://")):
+        if not (url.startswith("http://") or url.startswith("https://") or url.startswith("file://")):
             escaped_query = urllib.parse.quote(query_or_url)
             # Use DuckDuckGo to bypass bot detection/CAPTCHA checks
             url = f"https://duckduckgo.com/?q={escaped_query}"
