@@ -485,7 +485,7 @@ class AlexAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-2-perseus-en",
+                model="aura-2-orion-en",
             ),
         )
 
@@ -1117,7 +1117,7 @@ class DianaAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=deepgram.TTS(
-                model="aura-2-stella-en",
+                model="aura-2-asteria-en",
             ),
         )
 
@@ -1380,9 +1380,9 @@ class DianaAgent(GenericAgent):
                 return res
             
             # Navigate to the local compliance_dashboard.html file
-            import os
-            dashboard_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "compliance_dashboard.html"))
-            file_url = f"file:///{dashboard_path.replace(os.sep, '/')}"
+            from pathlib import Path
+            dashboard_path = Path(__file__).parent / "compliance_dashboard.html"
+            file_url = dashboard_path.as_uri()
             logger.info(f"Diana navigating to dashboard url: {file_url}")
             res = await self.session.presenter.browse_to(file_url)
             return res
