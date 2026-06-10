@@ -2,9 +2,12 @@ import base64
 import json
 import logging
 import os
+import smtplib
 import time
 import urllib.request
 import uuid
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 logger = logging.getLogger("agent")
 
@@ -303,6 +306,60 @@ def get_pptx_summary() -> str:
     except Exception as e:
         logger.error(f"Error parsing PPTX presentation: {e}")
         return f"Error reading presentation: {e}"
+
+
+def send_outlook_smtp_email(recipient: str, subject: str, body: str) -> bool:
+    server_addr = os.getenv("SMTP_SERVER", "smtp.office365.com")
+    try:
+        port = int(os.getenv("SMTP_PORT", "587"))
+    except (TypeError, ValueError):
+        port = 587
+        
+    sender = os.getenv("OUTLOOK_EMAIL")
+    password = os.getenv("OUTLOOK_PASSWORD")
+    
+    if not sender or not password:
+        logger.error("SMTP credentials not fully set in environment")
+        return False
+        
+    msg = MIMEMultipart()
+    msg["From"] = sender
+    msg["To"] = recipient
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "plain"))
+    
+    try:
+        with smtplib.SMTP(server_addr, port) as server:
+            server.starttls()
+            server.login(sender, password)
+            server.send_message(msg)
+        logger.info(f"Outlook SMTP email sent successfully to {recipient}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send Outlook SMTP email: {e}")
+        return False
+
+
+def send_teams_webhook_ping(webhook_url: str, text: str) -> bool:
+    if not webhook_url:
+        logger.error("Teams webhook URL is empty")
+        return False
+    payload = {"text": text}
+    req_data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        webhook_url,
+        data=req_data,
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req) as response:
+            response.read()
+        logger.info("Teams webhook ping sent successfully")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to ping Teams webhook: {e}")
+        return False
 
 
 # Generate the default pptx file immediately on module load

@@ -20,6 +20,8 @@ from api_helpers import (
     find_devops_work_item_by_linear_id,
     resolve_linear_issue,
     get_pptx_summary,
+    send_outlook_smtp_email,
+    send_teams_webhook_ping,
 )
 
 logger = logging.getLogger("agent")
@@ -140,10 +142,33 @@ class TomAgent(GenericAgent):
     @function_tool
     async def end_conversation(self):
         """Call this function when the user wants to end the meeting or say goodbye."""
-        logger.info("Tom is ending the conversation")
+        logger.info("Tom is ending the conversation and generating summary")
         self.session.interrupt()
+        
+        chat_ctx_copy = self.chat_ctx.copy()
+        chat_ctx_copy.add_message(
+            role="system",
+            content="Provide a clean, professional, and structured text summary of the decisions, actions, and tickets discussed in this meeting. Do not include voice instructions or metadata. Keep it readable as an email."
+        )
+        
+        try:
+            llm_stream = self.llm.chat(chat_ctx=chat_ctx_copy)
+            collected = await llm_stream.collect()
+            summary_text = collected.text
+        except Exception as e:
+            logger.error(f"Failed to generate summary text: {e}")
+            summary_text = "Meeting closed. No summary could be generated."
+        
+        # Ping Teams if webhook URL exists
+        teams_webhook = os.getenv("TEAMS_WEBHOOK_URL")
+        if teams_webhook:
+            send_teams_webhook_ping(
+                teams_webhook,
+                f"🔔 **Meeting Summary**\n\n{summary_text}"
+            )
+            
         await self.session.generate_reply(
-            instructions="Summarize everything that happened in this meeting in a concise closing statement. Mention the key decisions: any tickets created, status changes, launch dates locked, emails sent, and compliance blockers raised. Then say 'Good meeting. Room closing.' and end.",
+            instructions="Tell the user that you've posted the meeting summary to Teams, say 'Good meeting. Room closing.', then end.",
             allow_interruptions=False,
         )
         job_ctx = get_job_context()
