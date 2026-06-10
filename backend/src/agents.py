@@ -223,6 +223,18 @@ class PriyaAgent(GenericAgent):
             ),
         )
 
+    async def on_enter(self):
+        # Update participant name
+        if hasattr(self.session, "room") and self.session.room:
+            try:
+                await self.session.room.local_participant.update_name("Priya")
+            except Exception as e:
+                logger.error(f"Failed to update participant name: {e}")
+        # Tom already introduced Priya — go straight to the SSO issue
+        self.session.generate_reply(
+            instructions="Tom has just introduced you by name. Do NOT say your name, your title, or greet anyone — Tom already did that. Immediately flag the SSO scope issue: SSO was dropped last week and three key prospects including Axcelerate need it on day one. Ask if you should add it back."
+        )
+
     @function_tool
     async def create_ticket(self, title: str, description: str, priority: str):
         """Use this tool to create a new ticket in the backlog.
@@ -476,6 +488,18 @@ class AlexAgent(GenericAgent):
             tts=deepgram.TTS(
                 model="aura-2-perseus-en",
             ),
+        )
+
+    async def on_enter(self):
+        # Update participant name
+        if hasattr(self.session, "room") and self.session.room:
+            try:
+                await self.session.room.local_participant.update_name("Alex")
+            except Exception as e:
+                logger.error(f"Failed to update participant name: {e}")
+        # Tom already introduced Alex — jump straight to sprint status
+        self.session.generate_reply(
+            instructions="Tom has just introduced you by name. Do NOT say your name, your title, or greet anyone — Tom already did that. Get straight to the point: ask what sprint update they need, or report sprint status if they have already asked."
         )
 
     @function_tool
@@ -830,6 +854,18 @@ class MarcusAgent(GenericAgent):
             ),
         )
 
+    async def on_enter(self):
+        # Update participant name
+        if hasattr(self.session, "room") and self.session.room:
+            try:
+                await self.session.room.local_participant.update_name("Marcus")
+            except Exception as e:
+                logger.error(f"Failed to update participant name: {e}")
+        # Tom already introduced Marcus — go straight to GTM
+        self.session.generate_reply(
+            instructions="Tom has just introduced you by name. Do NOT say your name, your title, or greet anyone — Tom already did that. Immediately bring up the October fourteenth Product Hunt launch date and propose locking it in."
+        )
+
     @function_tool
     async def create_ticket(self, title: str, description: str, priority: str):
         """Use this tool to create a new campaign or launch ticket in the backlog.
@@ -1145,6 +1181,18 @@ class DianaAgent(GenericAgent):
             tts=deepgram.TTS(
                 model="aura-2-stella-en",
             ),
+        )
+
+    async def on_enter(self):
+        # Update participant name
+        if hasattr(self.session, "room") and self.session.room:
+            try:
+                await self.session.room.local_participant.update_name("Diana")
+            except Exception as e:
+                logger.error(f"Failed to update participant name: {e}")
+        # Tom already introduced Diana — raise compliance issues immediately
+        self.session.generate_reply(
+            instructions="Tom has just introduced you by name. Do NOT say your name, your title, or greet anyone — Tom already did that. Immediately raise the two compliance issues: first the General Data Protection Regulation onboarding consent gap, then the EU AI Act review."
         )
 
     @function_tool

@@ -19,13 +19,16 @@ ENV UV_COMPILE_BYTECODE=1
 ENV HF_HOME=/app/.cache/huggingface
 ENV TORCH_HOME=/app/.cache/torch
 
+# Store Playwright browser binaries inside /app so they are copied to the final stage
+ENV PLAYWRIGHT_BROWSERS_PATH=/app/.playwright-browsers
+
 # --- Build stage ---
 # Install dependencies, build native extensions, and prepare the application
 FROM base AS build
 
 # Install build dependencies required for Python packages with native extensions
 # gcc: C compiler needed for building Python packages with C extensions
-# g++: C++ compiler needed for building Python packages with C++ extensions
+# g++: C++ compiler needed for building Python packages with C extensions
 # python3-dev: Python development headers needed for compilation
 # We clean up the apt cache after installation to keep the image size down
 RUN apt-get update && apt-get install -y \
@@ -54,6 +57,11 @@ RUN uv sync --locked
 # loading your agent code.
 RUN uv run --module livekit.agents download-files
 
+# Install Playwright Chromium browser binary into /app/.playwright-browsers
+# so it gets copied to the final stage in COPY --from=build /app /app
+# --with-deps also installs required system libraries in the build container
+RUN uv run playwright install --with-deps chromium
+
 # Copy all remaining application files into the container
 # This includes source code, configuration files, and dependency specifications
 # (Excludes files specified in .dockerignore)
@@ -73,6 +81,27 @@ RUN adduser \
     --shell "/sbin/nologin" \
     --uid "${UID}" \
     appuser
+
+# Install Chromium runtime system library dependencies in the final stage
+# (system libs from build stage are NOT carried over in multi-stage builds)
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libnspr4 \
+    libdbus-1-3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libasound2 \
+  && rm -rf /var/lib/apt/lists/*
 
 # Copy the application and virtual environment with correct ownership in a single layer
 # This avoids expensive recursive chown and excludes build tools from the final image
