@@ -201,10 +201,19 @@ class SlidePresenter:
                     logger.warning(f"Failed to launch with chrome channel: {e_chrome}. Falling back to default chromium...")
                     self.browser = await self.playwright.chromium.launch(headless=True)
 
-            state_path = "linear_state.json"
-            storage_state = state_path if os.path.exists(state_path) else None
+            state_paths = [
+                "linear_state.json",
+                os.path.join(os.path.dirname(__file__), "linear_state.json"),
+                os.path.join(os.path.dirname(__file__), "..", "linear_state.json")
+            ]
+            storage_state = None
+            for p in state_paths:
+                if os.path.exists(p):
+                    storage_state = p
+                    break
+                    
             if storage_state:
-                logger.info(f"Loading Playwright storage state from: {state_path}")
+                logger.info(f"Loading Playwright storage state from: {storage_state}")
                 
             self.browser_context = await self.browser.new_context(
                 storage_state=storage_state,
