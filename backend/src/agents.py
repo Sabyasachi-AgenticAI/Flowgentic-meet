@@ -415,9 +415,11 @@ class PriyaAgent(GenericAgent):
             res = await self.session.presenter.start_browser_session()
             if "Error" in res:
                 return res
-            res = await self.session.presenter.browse_to("https://linear.app/")
-            click_res = await self.session.presenter.click_all_issues()
-            logger.info(f"Click 'All issues' result: {click_res}")
+            from pathlib import Path
+            backlog_path = Path(__file__).parent / "linear_backlog.html"
+            file_url = backlog_path.as_uri()
+            logger.info(f"Priya navigating to backlog URL: {file_url}")
+            res = await self.session.presenter.browse_to(file_url)
             return res
         return "Slide presenter is not available in this session."
 

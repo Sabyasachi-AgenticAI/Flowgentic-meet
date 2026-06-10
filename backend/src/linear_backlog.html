@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NexaCore FlowSync - Linear Sprint Backlog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #080a13;
+            --card-bg: rgba(22, 28, 54, 0.6);
+            --card-hover-bg: rgba(30, 38, 70, 0.8);
+            --border-color: rgba(255, 255, 255, 0.05);
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --text-primary: #ffffff;
+            --text-secondary: #8f9cae;
+            --priority-urgent: #ef4444;
+            --priority-high: #f97316;
+            --priority-medium: #eab308;
+            --priority-low: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow: hidden;
+            padding: 30px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: radial-gradient(circle at top left, rgba(139, 92, 246, 0.1), transparent 500px),
+                              radial-gradient(circle at bottom right, rgba(6, 182, 212, 0.08), transparent 500px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .badge {
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: #c084fc;
+            padding: 5px 12px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .board-container {
+            display: flex;
+            gap: 20px;
+            flex-grow: 1;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 280px;
+            background: rgba(15, 19, 39, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .column-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .column-count {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card:hover {
+            background: var(--card-hover-bg);
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .card-id {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .priority-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .priority-badge.urgent {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--priority-urgent);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .priority-badge.high {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--priority-high);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .priority-badge.medium {
+            background: rgba(234, 179, 8, 0.1);
+            color: var(--priority-medium);
+            border: 1px solid rgba(234, 179, 8, 0.2);
+        }
+
+        .priority-badge.low {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--priority-low);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .assignee-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            <h1>NexaCore FlowSync - Linear Backlog</h1>
+            <p>Sprint Planning Board</p>
+        </div>
+        <div class="badge">Active Sprint: 6 Weeks To Launch</div>
+    </div>
+
+    <div class="board-container">
+        <!-- BACKLOG COLUMN -->
+        <div class="column">
+            <div class="column-header">
+                <span class="column-title">📋 Backlog</span>
+                <span class="column-count">4</span>
+            </div>
+            <div class="card-list">
+                <div class="card">
+                    <div class="card-id">FLO-4</div>
+                    <div class="card-title">SSO Authentication Integration</div>
+                    <div class="card-footer">
+                        <span class="priority-badge urgent">Urgent</span>
+                        <div class="assignee-avatar" style="background-color: #ec4899;">PM</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-id">FLO-12</div>
+                    <div class="card-title">EU Launch Materials Compliance Check</div>
+                    <div class="card-footer">
+                        <span class="priority-badge medium">Medium</span>
+                        <div class="assignee-avatar" style="background-color: #3b82f6;">DA</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-id">FLO-25</div>
+                    <div class="card-title">GDPR Onboarding Consent Validation</div>
+                    <div class="card-footer">
+                        <span class="priority-badge high">High</span>
+                        <div class="assignee-avatar" style="background-color: #10b981;">DA</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-id">FLO-26</div>
+                    <div class="card-title">AI Act Recommendation Model Audit</div>
+                    <div class="card-footer">
+                        <span class="priority-badge medium">Medium</span>
+                        <div class="assignee-avatar" style="background-color: #8b5cf6;">DA</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TODO COLUMN -->
+        <div class="column">
+            <div class="column-header">
+                <span class="column-title">⏳ Todo</span>
+                <span class="column-count">3</span>
+            </div>
+            <div class="card-list">
+                <div class="card">
+                    <div class="card-id">FLO-8</div>
+                    <div class="card-title">API Routing & Gateway Config</div>
+                    <div class="card-footer">
+                        <span class="priority-badge medium">Medium</span>
+                        <div class="assignee-avatar" style="background-color: #f59e0b;">AX</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-id">FLO-9</div>
+                    <div class="card-title">Telemetry and Event Tracking Pipeline</div>
+                    <div class="card-footer">
+                        <span class="priority-badge low">Low</span>
+                        <div class="assignee-avatar" style="background-color: #10b981;">AX</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-id">FLO-6</div>
+                    <div class="card-title">Custom Dashboard Analytics Widget</div>
+                    <div class="card-footer">
+                        <span class="priority-badge low">Low</span>
+                        <div class="assignee-avatar" style="background-color: #ec4899;">PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IN PROGRESS COLUMN -->
+        <div class="column">
+            <div class="column-header">
+                <span class="column-title">⚡ In Progress</span>
+                <span class="column-count">1</span>
+            </div>
+            <div class="card-list">
+                <div class="card">
+                    <div class="card-id">FLO-3</div>
+                    <div class="card-title">Core Database Migration & Optimization</div>
+                    <div class="card-footer">
+                        <span class="priority-badge high">High</span>
+                        <div class="assignee-avatar" style="background-color: #8b5cf6;">AX</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DONE COLUMN -->
+        <div class="column">
+            <div class="column-header">
+                <span class="column-title">✅ Done</span>
+                <span class="column-count">2</span>
+            </div>
+            <div class="card-list">
+                <div class="card" style="opacity: 0.65;">
+                    <div class="card-id">FLO-1</div>
+                    <div class="card-title">Landing Page Responsive UI Refresh</div>
+                    <div class="card-footer">
+                        <span class="priority-badge medium" style="background: rgba(255,255,255,0.05); color: #9ca3af; border: 1px solid rgba(255,255,255,0.1);">Done</span>
+                        <div class="assignee-avatar" style="background-color: #9ca3af;">AX</div>
+                    </div>
+                </div>
+                <div class="card" style="opacity: 0.65;">
+                    <div class="card-id">FLO-2</div>
+                    <div class="card-title">Auth Middleware Boilerplate Integration</div>
+                    <div class="card-footer">
+                        <span class="priority-badge high" style="background: rgba(255,255,255,0.05); color: #9ca3af; border: 1px solid rgba(255,255,255,0.1);">Done</span>
+                        <div class="assignee-avatar" style="background-color: #9ca3af;">AX</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
