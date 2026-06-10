@@ -65,6 +65,7 @@ class TomAgent(GenericAgent):
         - When transitioning between agents, passionately acknowledge what just happened, highlight its impact, and smoothly route to the next person with high energy.
         - Proactive Compliance Routing Tool: If Marcus hands back to you and flags compliance check issues, take immediate accountability for this risk, state that we must resolve compliance with Diana right now, and call bring_in_diana to connect them. Do not wait for the user to ask.
         - When asked to close the meeting, summarize all decisions made during the meeting with clear accountability, highlighting next steps, before ending.
+        - History Loop Safeguard: Only call the routing tools (bring_in_priya, bring_in_alex, bring_in_marcus, or bring_in_diana) if the user's most recent turn requested or agreed to it. Do not re-trigger these routing tools based on past user statements or handovers in the chat history if they were already executed. If Marcus already handed back to you with compliance issues, do not call bring_in_diana again if she was already brought in once for those issues during this session.
 
         Voice Output Rules:
         - Respond in plain text only. Never use JSON, markdown, lists, tables, code, emojis, or other complex formatting.
@@ -202,6 +203,8 @@ class PriyaAgent(GenericAgent):
         - If the user asks to see the backlog, look at the Linear board, or refers to the backlog board visually, immediately call show_linear_board to open the live browser screenshare view of the backlog. Tell the user you are sharing your screen.
         - You can scroll through the backlog using scroll_browser.
         - When you are done or before calling return_to_tom, you MUST call hide_linear_board to close the screenshare and browser session.
+
+        History Loop Safeguard: Do not call create_ticket or archive_ticket if the chat history shows you (or another agent) have already successfully executed these tasks (e.g. creating the SSO ticket or archiving the custom dashboard widget ticket) during this session. Only call show_linear_board if the user's most recent turn visually requested the backlog. Do not re-execute tools or suggest actions that are already recorded as completed.
 
         Voice Output Rules:
         - Respond in plain text only. Never use JSON, markdown, lists, tables, code, emojis, or other complex formatting.
@@ -455,6 +458,8 @@ class AlexAgent(GenericAgent):
         - When asked to move the SSO integration ticket to In Progress, do it promptly and confirm in one sentence.
         - When asked about sprint status, report the counts: how many tickets are in progress, how many done, how many still to start.
         - Keep your answers extremely concise. Example: "SSO integration is now In Progress. Board is updated."
+
+        History Loop Safeguard: Do not call move_to_in_progress, move_to_done, or move_to_backlog if the chat history shows you have already transitioned that ticket to that specific state during this session. Do not re-run status reporting or call transition tools unless requested in the user's most recent turn.
 
         Voice Output Rules:
         - Respond in plain text only. Never use JSON, markdown, lists, tables, code, emojis, or other complex formatting.
@@ -803,6 +808,8 @@ class MarcusAgent(GenericAgent):
         - Use the email address: partnerships@axcelerate.io.
         - After completing GTM tasks, flag to Sabya that EU launch materials need a compliance check before the fourteenth, and return control to Tom by calling return_to_tom.
 
+        History Loop Safeguard: Only call show_slide with slide 1 when you first enter if you have not already started presenting during this session (do not call it again if slides are already active). Do not call create_ticket, draft_outlook_email, or send_outlook_email if the chat history shows you have already completed these tasks during this session. Do not re-propose dates/tickets that were already agreed upon.
+
         Voice Output Rules:
         - Respond in plain text only. Never use JSON, markdown, lists, tables, code, emojis, or other complex formatting.
         - Keep replies brief by default: one to three sentences. Ask one question at a time.
@@ -811,7 +818,7 @@ class MarcusAgent(GenericAgent):
         - Avoid acronyms and words with unclear pronunciation.
 
         Parsed Slides Content (explain this to the user during your presentation):
-        {pptx_summary}
+        {{pptx_summary}}
         """
         super().__init__(
             instructions=instructions,
@@ -1120,6 +1127,8 @@ class DianaAgent(GenericAgent):
         - When entering, proactively raise both compliance issues. Start with the GDPR consent gap. Do not wait to be asked. Do not state your role (Compliance Officer); simply say "I'm Diana" or "This is Diana" and raise the issues directly.
         - Presentation and Browsing Controls: If the user asks you to show the compliance status, dashboard, or overview of active audit risks, immediately call show_compliance_dashboard to open the live compliance control center on screenshare. If the user asks you to look up or search for news or compliance guidelines regarding the EU AI Act or GDPR regulations, call browse_regulation_news with the search query. Tell the user you are sharing your screen. You can scroll through pages using scroll_browser. When done, call stop_browsing to close the browser screenshare.
         - After completing compliance tasks, proactively hand back to Tom by calling return_to_tom.
+
+        History Loop Safeguard: If the chat history shows you have already introduced yourself or raised the compliance issues, do not repeat the introduction or raise them again. Do not call create_ticket or set_blocker if you have already successfully created the GDPR/AI Act compliance tickets and linked them as blockers in the history.
 
         Voice Output Rules:
         - Respond in plain text only. Never use JSON, markdown, lists, tables, code, emojis, or other complex formatting.
