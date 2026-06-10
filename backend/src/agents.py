@@ -20,7 +20,6 @@ from api_helpers import (
     find_devops_work_item_by_linear_id,
     resolve_linear_issue,
     get_pptx_summary,
-    send_outlook_smtp_email,
     send_teams_webhook_ping,
 )
 
@@ -812,16 +811,11 @@ class MarcusAgent(GenericAgent):
 
         instructions = f"""
         Your name is Marcus. You are the Go-To-Market Lead at NexaCore Inc.
-        Your job is to own the go-to-market plan for FlowSync. You lock dates, create campaign tickets, and send outreach emails.
+        Your job is to own the go-to-market plan for FlowSync. You lock dates and create campaign tickets.
         You are energetic, decisive, commercially sharp, always have an opinion, and move fast.
         Never ask "How can I help you?" or "How can I assist?". You are a colleague in a war room, not a customer support assistant.
         You have access to Linear to create tickets, search tickets, and set priorities.
-        You have access to Outlook to send and draft outreach emails, and Slack to post updates.
-
-        CRITICAL EMAIL RULE:
-        Before sending any email (calling send_outlook_email), you MUST ask the user "send now or save as draft?" and get their confirmation.
-        If they want to draft it, use draft_outlook_email.
-        If they confirm sending, use send_outlook_email.
+        You have access to Slack to post updates.
 
         Demo Context:
         - The product is FlowSync by NexaCore Inc. Launch target is October fourteenth.
@@ -829,12 +823,10 @@ class MarcusAgent(GenericAgent):
         - Before handing off or returning to Tom, you MUST call stop_presentation to close the presentation and stop screen sharing.
         - We need to lock October fourteenth as the Product Hunt launch date. Propose October fourteenth immediately.
         - After locking the date, create a "Product Hunt Launch Coordination" ticket.
-        - Proactively suggest creating a private beta invite ticket marked urgent, and offer to send an email to Axcelerate.
-        - The email to Axcelerate should have subject: "Early access to FlowSync before October fourteenth."
-        - Use the email address: partnerships@axcelerate.io.
+        - Proactively suggest creating a private beta invite ticket marked urgent.
         - After completing GTM tasks, flag to Sabya that EU launch materials need a compliance check before the fourteenth, and return control to Tom by calling return_to_tom.
 
-        History Loop Safeguard: Only call show_slide with slide 1 when you first enter if you have not already started presenting during this session (do not call it again if slides are already active). Do not call create_ticket, draft_outlook_email, or send_outlook_email if the chat history shows you have already completed these tasks during this session. Do not re-propose dates/tickets that were already agreed upon.
+        History Loop Safeguard: Only call show_slide with slide 1 when you first enter if you have not already started presenting during this session (do not call it again if slides are already active). Do not call create_ticket if the chat history shows you have already completed these tasks during this session. Do not re-propose dates/tickets that were already agreed upon.
 
         Voice Output Rules:
         - Respond in plain text only. Never use JSON, markdown, lists, tables, code, emojis, or other complex formatting.
@@ -1023,60 +1015,6 @@ class MarcusAgent(GenericAgent):
 
         logger.info(f"Marcus set priority for ticket {linear_identifier} in Linear to {priority}")
         return f"Priority for ticket {linear_identifier} updated successfully in Linear."
-
-    @function_tool
-    async def send_outlook_email(self, recipient: str, subject: str, body: str):
-        """Use this tool to send the finalized GTM campaign outreach email to a prospect immediately.
-        
-        Args:
-            recipient: The email address of the recipient
-            subject: The subject of the email
-            body: The body content of the email
-        """
-        webhook_url = os.getenv("N8N_OUTLOOK_EMAIL_WEBHOOK_URL")
-        payload = {
-            "action": "send",
-            "recipient": recipient,
-            "subject": subject,
-            "body": body,
-            "agent": "Marcus"
-        }
-        
-        if webhook_url:
-            res = call_n8n_webhook(webhook_url, payload)
-            if res:
-                return f"Email to {recipient} sent successfully via Outlook (n8n workflow)."
-            return f"Failed to trigger n8n workflow for sending Outlook email to {recipient}."
-        
-        logger.info(f"Marcus sent Outlook email (MOCK) to {recipient}: {subject}")
-        return f"Outlook email sent to {recipient} successfully (mocked)."
-
-    @function_tool
-    async def draft_outlook_email(self, recipient: str, subject: str, body: str):
-        """Use this tool to save a draft GTM campaign outreach email to a prospect in Outlook drafts folder.
-        
-        Args:
-            recipient: The email address of the recipient
-            subject: The subject of the email
-            body: The body content of the email
-        """
-        webhook_url = os.getenv("N8N_OUTLOOK_EMAIL_WEBHOOK_URL")
-        payload = {
-            "action": "draft",
-            "recipient": recipient,
-            "subject": subject,
-            "body": body,
-            "agent": "Marcus"
-        }
-        
-        if webhook_url:
-            res = call_n8n_webhook(webhook_url, payload)
-            if res:
-                return f"Email draft for {recipient} created successfully in Outlook (n8n workflow)."
-            return f"Failed to trigger n8n workflow for drafting Outlook email for {recipient}."
-        
-        logger.info(f"Marcus drafted Outlook email (MOCK) to {recipient}: {subject}")
-        return f"Outlook email draft saved for {recipient} successfully (mocked)."
 
     @function_tool
     async def post_to_slack(self, channel: str, message: str):
