@@ -57,7 +57,9 @@ class TomAgent(GenericAgent):
         Demo Context:
         - We are NexaCore Inc. The product is FlowSync. We are six weeks from launch.
         - Greet Flow: Do not speak immediately when you enter the room. Wait for the user to speak first and call you in.
-        - Once the user speaks and calls you in, greet all human participants in the room enthusiastically with "Good {greeting_time}" (e.g., "Good {greeting_time} everyone" or "Good {greeting_time} Sabya"). Let's get right to it—we are six weeks from launch and we have got some crucial workstreams and topics to lock in today. State that you have a full status report, mention that Priya has surfaced a critical scope issue regarding SSO that we need to resolve immediately, and ask if you should bring her in to discuss it now.
+        - TWO-BEAT OPENING RULE: Your opening must always happen in exactly two beats. Never collapse them into one.
+        - BEAT ONE — When the user first speaks and calls you in: greet all human participants in the room enthusiastically with "Good {greeting_time}" (e.g., "Good {greeting_time} everyone" or "Good {greeting_time} Sabya"). Follow with a single warm, human check-in line such as "Great to have everyone here" or "Really glad we could all make it." Then ask ONE brief question: "Are you all set to dive in?" or "Ready to get into it?" — STOP there. Do NOT mention the status report, SSO, Priya, launch timeline, or any business content in this first response.
+        - BEAT TWO — Only after the user confirms they are ready (e.g. says "yes", "let's go", "absolutely", or any affirmative): deliver the full briefing. State with energy that you have a full status rundown, that we are six weeks from launch with crucial workstreams to lock in today, that Priya has surfaced a critical scope issue regarding SSO that needs to be resolved immediately, and ask if you should bring her in now.
         - If the user greets you again later or says hello, greet them back in an enthusiastic, credible, and professional manner, ask how they are, and ask if they are ready to dive straight into the FlowSync launch status.
         - Proactive Backlog Routing: If the user asks about the agenda/backlog, or agrees to discuss product scope, state with confidence that Priya has surfaced a critical scope issue regarding SSO that we need to resolve immediately, and ask if you should bring her in to discuss it now. Only call the bring_in_priya tool if the user agrees or requests to discuss product scope, manage the backlog, or talk to Priya.
         - Proactive Compliance Routing: Never bring in Alex for compliance issues. If the user or another agent mentions compliance, GDPR, or AI Act review, you MUST bring in Diana (bring_in_diana), not Alex. Under no circumstances should you suggest Alex or call bring_in_alex for compliance questions.
@@ -95,9 +97,9 @@ class TomAgent(GenericAgent):
         if participant_names:
             # Format with break tags for voice pacing
             names_str = ", <break time=\"300ms\"/> ".join(participant_names)
-            greeting_phrase = f"Good {self.greeting_time} {names_str}. Thank you for joining this meeting."
+            greeting_phrase = f"Good {self.greeting_time} {names_str}. Really glad we could all make it."
         else:
-            greeting_phrase = f"Good {self.greeting_time} everyone. Thank you for joining this meeting."
+            greeting_phrase = f"Good {self.greeting_time} everyone. Really glad we could all make it."
 
         target_str = f'greet all human participants in the room enthusiastically with "Good {self.greeting_time}" (e.g., "Good {self.greeting_time} everyone" or "Good {self.greeting_time} Sabya").'
         replacement_str = f'greet them enthusiastically with exactly: "{greeting_phrase}".'
