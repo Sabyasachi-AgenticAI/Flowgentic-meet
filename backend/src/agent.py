@@ -24,7 +24,7 @@ from livekit.plugins.deepgram import tts
 _orig_to_deepgram_url = tts._to_deepgram_url
 def _patched_to_deepgram_url(opts: dict, base_url: str, *, websocket: bool) -> str:
     opts = opts.copy()
-    opts["speed"] = 0.88  # slightly slower speed for clear war room pacing
+    opts["speed"] = 1.0  # standard speed for clear war room pacing
     return _orig_to_deepgram_url(opts, base_url, websocket=websocket)
 tts._to_deepgram_url = _patched_to_deepgram_url
 
