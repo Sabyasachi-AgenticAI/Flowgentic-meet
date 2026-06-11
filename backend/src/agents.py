@@ -8,7 +8,7 @@ import textwrap
 from livekit import api
 from livekit.agents import ChatContext, function_tool
 from livekit.agents.job import get_job_context
-from livekit.plugins import deepgram
+from livekit.plugins import elevenlabs
 
 from agent_base import GenericAgent
 from api_helpers import (
@@ -78,8 +78,8 @@ class TomAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=deepgram.TTS(
-                model="aura-2-orion-en",
+            tts=elevenlabs.TTS(
+                voice_id="1SM7GgM6IMuvQlz2BwM3",
             ),
             first_time=first_time,
         )
@@ -218,8 +218,8 @@ class PriyaAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=deepgram.TTS(
-                model="aura-2-luna-en",
+            tts=elevenlabs.TTS(
+                voice_id="QTKSa2Iyv0yoxvXY2V8a",
             ),
         )
 
@@ -484,8 +484,8 @@ class AlexAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=deepgram.TTS(
-                model="aura-2-orion-en",
+            tts=elevenlabs.TTS(
+                voice_id="QbrR6b6YCLjyBkFKH5Xz",
             ),
         )
 
@@ -842,8 +842,8 @@ class MarcusAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=deepgram.TTS(
-                model="aura-2-apollo-en",
+            tts=elevenlabs.TTS(
+                voice_id="fVVjLtJgnQI61CoImgHU",
             ),
         )
 
@@ -1117,8 +1117,8 @@ class DianaAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=deepgram.TTS(
-                model="aura-2-asteria-en",
+            tts=elevenlabs.TTS(
+                voice_id="oW8bn5YtBB89X2nJ0DT9",
             ),
         )
 

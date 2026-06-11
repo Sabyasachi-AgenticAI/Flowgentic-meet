@@ -15,18 +15,10 @@ from livekit.agents import (
     UserInputTranscribedEvent,
     ConversationItemAddedEvent,
 )
-from livekit.plugins import ai_coustics, deepgram, silero
+from livekit.plugins import ai_coustics, deepgram, elevenlabs, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from slide_presenter import SlidePresenter
 
-# Patch Deepgram TTS to slow down speech rate
-from livekit.plugins.deepgram import tts
-_orig_to_deepgram_url = tts._to_deepgram_url
-def _patched_to_deepgram_url(opts: dict, base_url: str, *, websocket: bool) -> str:
-    opts = opts.copy()
-    opts["speed"] = 1.0  # standard speed for clear war room pacing
-    return _orig_to_deepgram_url(opts, base_url, websocket=websocket)
-tts._to_deepgram_url = _patched_to_deepgram_url
 
 # Import modular components for use and backwards-compatibility (e.g. tests)
 from agents import (
@@ -76,7 +68,7 @@ async def my_agent(ctx: JobContext):
     # Set up the standard Voice Pipeline (STT -> LLM -> TTS)
     session = AgentSession(
         stt=deepgram.STT(model="nova-3", language="en-US"),
-        tts=deepgram.TTS(),
+        tts=elevenlabs.TTS(),
         turn_detection=MultilingualModel(),
         vad=ctx.proc.userdata["vad"],
         preemptive_generation=True,
