@@ -79,7 +79,7 @@ class TomAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
-                voice_id="1SM7GgM6IMuvQlz2BwM3",
+                voice_id="pNInz6obpgDQGcFmaJgB",
             ),
             first_time=first_time,
         )
@@ -219,7 +219,7 @@ class PriyaAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
-                voice_id="QTKSa2Iyv0yoxvXY2V8a",
+                voice_id="EXAVITQu4vr4xnSDxMaL",
             ),
         )
 
@@ -485,7 +485,7 @@ class AlexAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
-                voice_id="QbrR6b6YCLjyBkFKH5Xz",
+                voice_id="VR6AewLTigWG4xSOukaG",
             ),
         )
 
@@ -843,7 +843,7 @@ class MarcusAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
-                voice_id="fVVjLtJgnQI61CoImgHU",
+                voice_id="ErXwobaYiN019PkySvjV",
             ),
         )
 
@@ -1118,7 +1118,7 @@ class DianaAgent(GenericAgent):
             instructions=instructions,
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
-                voice_id="oW8bn5YtBB89X2nJ0DT9",
+                voice_id="Xb7hH8MSUJpSbSDYk0k2",
             ),
         )
 
