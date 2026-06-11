@@ -30,6 +30,11 @@ class SlidePresenter:
         self.browser_context = None
         self.page = None
         
+        # Cache for browser screenshot optimization
+        self.cached_browser_image = None
+        self.last_screenshot_time = 0.0
+        self.browser_needs_update = False
+        
         # Load premium Windows system font if available, fallback to default
         self.font_title = None
         self.font_header = None
@@ -230,6 +235,7 @@ class SlidePresenter:
             )
             
             self.mode = "browser"
+            self.browser_needs_update = True
             logger.info("Browser session started successfully.")
             return "Browser session started successfully."
         except Exception as e:
@@ -251,6 +257,7 @@ class SlidePresenter:
         try:
             # We wait up to 12s for load, capturing page rendering state
             await self.page.goto(url, timeout=12000, wait_until="load")
+            self.browser_needs_update = True
             return f"Navigated successfully to: {url}"
         except Exception as e:
             logger.error(f"Failed navigating to {url}: {e}")
@@ -264,9 +271,11 @@ class SlidePresenter:
         try:
             if direction.lower() == "down":
                 await self.page.evaluate("window.scrollBy(0, 400);")
+                self.browser_needs_update = True
                 return "Scrolled down successfully."
             elif direction.lower() == "up":
                 await self.page.evaluate("window.scrollBy(0, -400);")
+                self.browser_needs_update = True
                 return "Scrolled up successfully."
             else:
                 return f"Invalid scroll direction: {direction}."
@@ -297,6 +306,7 @@ class SlidePresenter:
                         element = loc.nth(i)
                         if await element.is_visible():
                             await element.click()
+                            self.browser_needs_update = True
                             logger.info("Clicked 'All issues' tab successfully.")
                             return "Clicked 'All issues' tab successfully."
                 except Exception as ex:
@@ -320,6 +330,7 @@ class SlidePresenter:
                 return false;
             }''')
             if clicked:
+                self.browser_needs_update = True
                 logger.info("Clicked 'All issues' via JS evaluation.")
                 return "Clicked 'All issues' tab via JS."
             
@@ -372,15 +383,27 @@ class SlidePresenter:
         """Renders the Pillow image based on mode (slides or browser)."""
         # If in browser mode, take screenshot of the active browser page
         if self.mode == "browser" and self.page:
-            try:
-                screenshot_bytes = await self.page.screenshot(type="png")
-                img = Image.open(BytesIO(screenshot_bytes))
-                if img.width != self.width or img.height != self.height:
-                    img = img.resize((self.width, self.height), Image.Resampling.LANCZOS)
-                return img.convert("RGBA")
-            except Exception as e:
-                logger.error(f"Failed to capture browser screenshot: {e}")
-                # Fallback to drawing standard slides below if screenshot fails
+            import time
+            current_time = time.time()
+            if (
+                self.cached_browser_image is None 
+                or self.browser_needs_update 
+                or (current_time - self.last_screenshot_time) >= 1.5
+            ):
+                try:
+                    screenshot_bytes = await self.page.screenshot(type="png")
+                    img = Image.open(BytesIO(screenshot_bytes))
+                    if img.width != self.width or img.height != self.height:
+                        img = img.resize((self.width, self.height), Image.Resampling.LANCZOS)
+                    self.cached_browser_image = img.convert("RGBA")
+                    self.last_screenshot_time = current_time
+                    self.browser_needs_update = False
+                except Exception as e:
+                    logger.error(f"Failed to capture browser screenshot: {e}")
+                    # Fallback to drawing standard slides below if screenshot fails
+            
+            if self.cached_browser_image:
+                return self.cached_browser_image
         
         # Create dark blue/violet gradient image background
         img = Image.new("RGBA", (self.width, self.height), (11, 13, 25, 255))

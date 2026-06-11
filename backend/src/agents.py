@@ -80,6 +80,13 @@ class TomAgent(GenericAgent):
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
                 voice_id="pNInz6obpgDQGcFmaJgB",
+                model="eleven_turbo_v2_5",
+                voice_settings=elevenlabs.VoiceSettings(
+                    stability=0.45,
+                    similarity_boost=0.75,
+                    style=0.1,
+                    use_speaker_boost=True,
+                ),
             ),
             first_time=first_time,
         )
@@ -220,6 +227,13 @@ class PriyaAgent(GenericAgent):
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
                 voice_id="EXAVITQu4vr4xnSDxMaL",
+                model="eleven_turbo_v2_5",
+                voice_settings=elevenlabs.VoiceSettings(
+                    stability=0.45,
+                    similarity_boost=0.75,
+                    style=0.1,
+                    use_speaker_boost=True,
+                ),
             ),
         )
 
@@ -486,6 +500,13 @@ class AlexAgent(GenericAgent):
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
                 voice_id="VR6AewLTigWG4xSOukaG",
+                model="eleven_turbo_v2_5",
+                voice_settings=elevenlabs.VoiceSettings(
+                    stability=0.45,
+                    similarity_boost=0.75,
+                    style=0.1,
+                    use_speaker_boost=True,
+                ),
             ),
         )
 
@@ -844,6 +865,13 @@ class MarcusAgent(GenericAgent):
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
                 voice_id="ErXwobaYiN019PkySvjV",
+                model="eleven_turbo_v2_5",
+                voice_settings=elevenlabs.VoiceSettings(
+                    stability=0.45,
+                    similarity_boost=0.75,
+                    style=0.1,
+                    use_speaker_boost=True,
+                ),
             ),
         )
 
@@ -1119,6 +1147,13 @@ class DianaAgent(GenericAgent):
             chat_ctx=chat_ctx,
             tts=elevenlabs.TTS(
                 voice_id="Xb7hH8MSUJpSbSDYk0k2",
+                model="eleven_turbo_v2_5",
+                voice_settings=elevenlabs.VoiceSettings(
+                    stability=0.45,
+                    similarity_boost=0.75,
+                    style=0.1,
+                    use_speaker_boost=True,
+                ),
             ),
         )
 
