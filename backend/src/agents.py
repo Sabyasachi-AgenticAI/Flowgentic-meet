@@ -84,8 +84,6 @@ class TomAgent(GenericAgent):
                 voice_settings=elevenlabs.VoiceSettings(
                     stability=0.45,
                     similarity_boost=0.75,
-                    style=0.1,
-                    use_speaker_boost=True,
                 ),
             ),
             first_time=first_time,
@@ -231,8 +229,6 @@ class PriyaAgent(GenericAgent):
                 voice_settings=elevenlabs.VoiceSettings(
                     stability=0.45,
                     similarity_boost=0.75,
-                    style=0.1,
-                    use_speaker_boost=True,
                 ),
             ),
         )
@@ -504,8 +500,6 @@ class AlexAgent(GenericAgent):
                 voice_settings=elevenlabs.VoiceSettings(
                     stability=0.45,
                     similarity_boost=0.75,
-                    style=0.1,
-                    use_speaker_boost=True,
                 ),
             ),
         )
@@ -869,8 +863,6 @@ class MarcusAgent(GenericAgent):
                 voice_settings=elevenlabs.VoiceSettings(
                     stability=0.45,
                     similarity_boost=0.75,
-                    style=0.1,
-                    use_speaker_boost=True,
                 ),
             ),
         )
@@ -1151,8 +1143,6 @@ class DianaAgent(GenericAgent):
                 voice_settings=elevenlabs.VoiceSettings(
                     stability=0.45,
                     similarity_boost=0.75,
-                    style=0.1,
-                    use_speaker_boost=True,
                 ),
             ),
         )
