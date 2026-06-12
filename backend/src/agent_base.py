@@ -33,6 +33,11 @@ class GenericAgent(Agent):
             except Exception as e:
                 logger.error(f"Failed to update participant name: {e}")
 
+        # Dynamically switch the session's active TTS to match the active agent's voice
+        if hasattr(self, "_tts") and self._tts and hasattr(self.session, "_tts"):
+            self.session._tts = self._tts
+            logger.info(f"Dynamically updated session TTS model to {getattr(self._tts, 'model', 'unknown')}")
+
         # Automatically trigger speech when an agent takes control (e.g. greets the user)
         if self.first_time:
             logger.info("First time enter: waiting for user to speak first.")
