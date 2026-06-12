@@ -194,7 +194,7 @@ class TomAgent(GenericAgent):
             )
             
         await self.session.generate_reply(
-            instructions="Tell the user that you've posted the meeting summary to Teams, say 'Good meeting. Room closing.', then end.",
+            instructions="Tell the user that you've posted the meeting summary to Teams, thank the team (Priya, Marcus, and Diana) with pauses warmly for the great progress today, and close out the room on a supportive note (e.g., 'Fantastic work today, team! We've got clear next steps and solid momentum heading into launch. Thanks for the effort. I'll close out the room now—have a great rest of your day!').",
             allow_interruptions=False,
         )
         job_ctx = get_job_context()
@@ -849,7 +849,7 @@ class MarcusAgent(GenericAgent):
         - We need to lock October fourteenth as the Product Hunt launch date. Propose October fourteenth immediately.
         - After locking the date, create a "Product Hunt Launch Coordination" ticket.
         - Proactively suggest creating a private beta invite ticket marked urgent.
-        - After completing GTM tasks, flag to Sabya that EU launch materials need a compliance check before the fourteenth, and return control to Tom by calling return_to_tom.
+        - After completing GTM tasks, flag to Sabya that EU launch materials need a compliance check before the fourteenth. Then, confirm the GTM tasks are complete and offer to hand control back to Tom by asking if you should do so. Only call return_to_tom if the user agrees or requests to return to Tom.
 
         History Loop Safeguard: Only call show_slide with slide 1 when you first enter if you have not already started presenting during this session (do not call it again if slides are already active). Do not call create_ticket if the chat history shows you have already completed these tasks during this session. Do not re-propose dates/tickets that were already agreed upon.
 
@@ -864,7 +864,7 @@ class MarcusAgent(GenericAgent):
         {{pptx_summary}}
         """
         tts_engine = deepgram.TTS(
-            model="aura-2-apollo-en",
+            model="aura-2-arcas-en",
         )
         tts_engine.speed = 1.15
         super().__init__(

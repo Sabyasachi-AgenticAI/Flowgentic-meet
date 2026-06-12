@@ -47,7 +47,7 @@ def patched_to_deepgram_url(opts: dict, base_url: str, *, websocket: bool) -> st
     except Exception:
         pass
 
-    if "speed" not in opts and opts.get("model") == "aura-2-apollo-en":
+    if "speed" not in opts and opts.get("model") in ("aura-2-helios-en", "aura-2-arcas-en"):
         opts["speed"] = 1.15
         
     return original_to_deepgram_url(opts, base_url, websocket=websocket)

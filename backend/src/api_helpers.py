@@ -310,7 +310,19 @@ def send_teams_webhook_ping(webhook_url: str, text: str) -> bool:
     if not webhook_url:
         logger.error("Teams webhook URL is empty")
         return False
-    payload = {"text": text}
+    
+    # Format line breaks to render correctly as paragraphs in Teams MessageCards
+    formatted_text = text.replace("\r\n", "\n").replace("\n", "\n\n").replace("\n\n\n\n", "\n\n")
+    
+    # Format as a standard Office 365 MessageCard payload expected by Teams Workflows
+    payload = {
+        "@type": "MessageCard",
+        "@context": "http://schema.org/extensions",
+        "themeColor": "0078D7",
+        "summary": "Meeting Summary",
+        "title": "🔔 NexaCore FlowSync Meeting Summary",
+        "text": formatted_text
+    }
     req_data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
         webhook_url,
