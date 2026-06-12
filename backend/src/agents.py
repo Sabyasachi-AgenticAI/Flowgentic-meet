@@ -8,7 +8,7 @@ import textwrap
 from livekit import api
 from livekit.agents import ChatContext, function_tool
 from livekit.agents.job import get_job_context
-from livekit.plugins import elevenlabs
+from livekit.plugins import deepgram
 
 from agent_base import GenericAgent
 from api_helpers import (
@@ -78,13 +78,8 @@ class TomAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=elevenlabs.TTS(
-                voice_id="pNInz6obpgDQGcFmaJgB",
-                model="eleven_turbo_v2_5",
-                voice_settings=elevenlabs.VoiceSettings(
-                    stability=0.45,
-                    similarity_boost=0.75,
-                ),
+            tts=deepgram.TTS(
+                model="aura-2-orion-en",
             ),
             first_time=first_time,
         )
@@ -223,13 +218,8 @@ class PriyaAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=elevenlabs.TTS(
-                voice_id="EXAVITQu4vr4xnSDxMaL",
-                model="eleven_turbo_v2_5",
-                voice_settings=elevenlabs.VoiceSettings(
-                    stability=0.45,
-                    similarity_boost=0.75,
-                ),
+            tts=deepgram.TTS(
+                model="aura-2-luna-en",
             ),
         )
 
@@ -494,13 +484,8 @@ class AlexAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=elevenlabs.TTS(
-                voice_id="VR6AewLTigWG4xSOukaG",
-                model="eleven_turbo_v2_5",
-                voice_settings=elevenlabs.VoiceSettings(
-                    stability=0.45,
-                    similarity_boost=0.75,
-                ),
+            tts=deepgram.TTS(
+                model="aura-2-orion-en",
             ),
         )
 
@@ -857,13 +842,8 @@ class MarcusAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=elevenlabs.TTS(
-                voice_id="ErXwobaYiN019PkySvjV",
-                model="eleven_turbo_v2_5",
-                voice_settings=elevenlabs.VoiceSettings(
-                    stability=0.45,
-                    similarity_boost=0.75,
-                ),
+            tts=deepgram.TTS(
+                model="aura-2-apollo-en",
             ),
         )
 
@@ -1137,13 +1117,8 @@ class DianaAgent(GenericAgent):
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=elevenlabs.TTS(
-                voice_id="Xb7hH8MSUJpSbSDYk0k2",
-                model="eleven_turbo_v2_5",
-                voice_settings=elevenlabs.VoiceSettings(
-                    stability=0.45,
-                    similarity_boost=0.75,
-                ),
+            tts=deepgram.TTS(
+                model="aura-2-asteria-en",
             ),
         )
 
