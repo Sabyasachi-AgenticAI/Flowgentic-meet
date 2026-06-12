@@ -1,9 +1,13 @@
 import json
 import logging
+import os
+import sys
 import time
 import uuid
 
 from dotenv import load_dotenv
+load_dotenv(".env.local")
+
 from livekit import api
 from livekit.agents import (
     AgentServer,
@@ -19,6 +23,37 @@ from livekit.plugins import ai_coustics, deepgram, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from slide_presenter import SlidePresenter
 
+# Monkey-patch Deepgram URL function to support custom speech speed
+import livekit.plugins.deepgram._utils
+import livekit.plugins.deepgram.tts
+
+original_to_deepgram_url = livekit.plugins.deepgram._utils._to_deepgram_url
+
+def patched_to_deepgram_url(opts: dict, base_url: str, *, websocket: bool) -> str:
+    opts = opts.copy()
+    try:
+        frame = sys._getframe(1)
+        for _ in range(3):
+            if not frame:
+                break
+            tts_self = frame.f_locals.get("self")
+            if tts_self and hasattr(tts_self, "speed"):
+                opts["speed"] = tts_self.speed
+                break
+            elif tts_self and hasattr(tts_self, "_tts") and hasattr(tts_self._tts, "speed"):
+                opts["speed"] = tts_self._tts.speed
+                break
+            frame = frame.f_back
+    except Exception:
+        pass
+
+    if "speed" not in opts and opts.get("model") == "aura-2-apollo-en":
+        opts["speed"] = 1.15
+        
+    return original_to_deepgram_url(opts, base_url, websocket=websocket)
+
+livekit.plugins.deepgram._utils._to_deepgram_url = patched_to_deepgram_url
+livekit.plugins.deepgram.tts._to_deepgram_url = patched_to_deepgram_url
 
 # Import modular components for use and backwards-compatibility (e.g. tests)
 from agents import (
@@ -44,7 +79,6 @@ from api_helpers import (
 
 logger = logging.getLogger("agent")
 
-load_dotenv(".env.local")
 
 server = AgentServer()
 

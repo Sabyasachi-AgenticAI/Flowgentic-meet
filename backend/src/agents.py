@@ -85,28 +85,52 @@ class TomAgent(GenericAgent):
         )
 
     async def on_enter(self):
-        # Gather all remote participant names
-        participant_names = []
+        # Update participant name dynamically to match the active agent
         if hasattr(self.session, "room") and self.session.room:
-            for p in self.session.room.remote_participants.values():
-                name = p.name or p.identity
-                if name:
-                    participant_names.append(name)
+            try:
+                await self.session.room.local_participant.update_name("Tom")
+                logger.info("Updated local participant name to: Tom")
+            except Exception as e:
+                logger.error(f"Failed to update participant name: {e}")
 
-        if participant_names:
-            # Format with break tags for voice pacing
-            names_str = ", <break time=\"300ms\"/> ".join(participant_names)
-            greeting_phrase = f"Good {self.greeting_time} {names_str}. Today we are here to discuss the launch progress and brief you all about the latest updates. We have just six weeks left for launch."
+        # Dynamically switch the session's active TTS to match the active agent's voice
+        if hasattr(self, "_tts") and self._tts and hasattr(self.session, "_tts"):
+            self.session._tts = self._tts
+            logger.info(f"Dynamically updated session TTS model to {getattr(self._tts, 'model', 'unknown')}")
+
+        if self.first_time:
+            # Gather all remote participant names
+            participant_names = []
+            if hasattr(self.session, "room") and self.session.room:
+                for p in self.session.room.remote_participants.values():
+                    name = p.name or p.identity
+                    if name:
+                        participant_names.append(name)
+
+            if participant_names:
+                # Format with break tags for voice pacing
+                names_str = ", <break time=\"300ms\"/> ".join(participant_names)
+                greeting_phrase = f"Good {self.greeting_time} {names_str}. Today we are here to discuss the launch progress and brief you all about the latest updates. We have just six weeks left for launch."
+            else:
+                greeting_phrase = f"Good {self.greeting_time} everyone. Today we are here to discuss the launch progress and brief you all about the latest updates. We have just six weeks left for launch."
+
+            target_str = f'greet all human participants in the room enthusiastically with "Good {self.greeting_time}" (e.g., "Good {self.greeting_time} everyone" or "Good {self.greeting_time} Sabya").'
+            replacement_str = f'greet them enthusiastically with exactly: "{greeting_phrase}".'
+
+            await self.update_instructions(self.instructions.replace(target_str, replacement_str))
+            logger.info(f"TomAgent dynamically set greeting to: {greeting_phrase}")
+
+            logger.info("First time enter: waiting for user to speak first.")
+            self.first_time = False
         else:
-            greeting_phrase = f"Good {self.greeting_time} everyone. Today we are here to discuss the launch progress and brief you all about the latest updates. We have just six weeks left for launch."
-
-        target_str = f'greet all human participants in the room enthusiastically with "Good {self.greeting_time}" (e.g., "Good {self.greeting_time} everyone" or "Good {self.greeting_time} Sabya").'
-        replacement_str = f'greet them enthusiastically with exactly: "{greeting_phrase}".'
-
-        await self.update_instructions(self.instructions.replace(target_str, replacement_str))
-        logger.info(f"TomAgent dynamically set greeting to: {greeting_phrase}")
-
-        await super().on_enter()
+            # Handover flow: Tom is entering from another agent (Priya, Alex, Marcus, Diana).
+            # Do NOT greet or say "How are you doing?". Prompt Tom to passionately summarize previous work.
+            handover_instructions = (
+                "You are returning to lead the meeting after a handover from another agent (such as Marcus, Priya, Alex, or Diana). "
+                "Do NOT greet the user, do NOT say 'Hello' or 'Good morning/afternoon/evening', and do NOT ask 'How are you doing?' or 'How are you?'. "
+                "Instead, passionately acknowledge what the previous agent just completed, highlight its impact/value for the launch, and ask the user where they want to pick up the agenda next (for example, compliance, backlog, sprint execution, or GTM)."
+            )
+            self.session.generate_reply(instructions=handover_instructions)
 
 
     @function_tool
@@ -839,12 +863,14 @@ class MarcusAgent(GenericAgent):
         Parsed Slides Content (explain this to the user during your presentation):
         {{pptx_summary}}
         """
+        tts_engine = deepgram.TTS(
+            model="aura-2-apollo-en",
+        )
+        tts_engine.speed = 1.15
         super().__init__(
             instructions=instructions,
             chat_ctx=chat_ctx,
-            tts=deepgram.TTS(
-                model="aura-2-apollo-en",
-            ),
+            tts=tts_engine,
         )
 
     async def on_enter(self):
