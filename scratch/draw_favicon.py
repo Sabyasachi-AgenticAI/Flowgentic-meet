@@ -10,76 +10,78 @@ def get_resample_filter():
         return Image.ANTIALIAS
     return 1
 
-def create_flowgentic_favicon():
-    size = 512
+def draw_os_window_logo():
+    size = 400
     resample = get_resample_filter()
+    
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
     
-    # Create mask for rounded rectangle
-    mask = Image.new("L", (size, size), 0)
-    mask_draw = ImageDraw.Draw(mask)
-    margin = 16
-    rect_box = [margin, margin, size - margin, size - margin]
-    radius = 112
-    mask_draw.rounded_rectangle(rect_box, radius=radius, fill=255)
+    # Gradient helper color calculation: #A78BFA -> #8B5CF6 -> #7C3AED
+    # Outer stroke (window box)
+    rect_box = [60, 90, 340, 310]
     
-    # Create background gradient image
-    bg = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    # Draw stroke by drawing outer rounded rect and masking inner rounded rect
+    mask_outer = Image.new("L", (size, size), 0)
+    d_out = ImageDraw.Draw(mask_outer)
+    d_out.rounded_rectangle(rect_box, radius=28, fill=255)
     
-    # Diagonal purple gradient
+    inner_box = [60 + 14, 90 + 14, 340 - 14, 310 - 14]
+    mask_inner = Image.new("L", (size, size), 0)
+    d_in = ImageDraw.Draw(mask_inner)
+    d_in.rounded_rectangle(inner_box, radius=20, fill=255)
+    
+    stroke_mask = Image.new("L", (size, size), 0)
+    for y in range(size):
+        for x in range(size):
+            out_v = mask_outer.getpixel((x, y))
+            in_v = mask_inner.getpixel((x, y))
+            if out_v > 0 and in_v == 0:
+                stroke_mask.putpixel((x, y), 255)
+                
+    # Create gradient layer
+    grad = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     for y in range(size):
         for x in range(size):
             t = (x + y) / (2 * size)
-            r = int(124 * (1 - t) + 167 * t)
-            g = int(58 * (1 - t) + 139 * t)
-            b = int(237 * (1 - t) + 250 * t)
-            bg.putpixel((x, y), (r, g, b, 255))
+            r = int(167 * (1 - t) + 124 * t)
+            g = int(139 * (1 - t) + 58 * t)
+            b = int(250 * (1 - t) + 237 * t)
+            grad.putpixel((x, y), (r, g, b, 255))
             
-    # Apply rounded mask to background
-    bg.putalpha(mask)
-    img = Image.alpha_composite(img, bg)
+    # Apply stroke mask
+    window_stroke = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    window_stroke.paste(grad, (0, 0), stroke_mask)
+    img = Image.alpha_composite(img, window_stroke)
     
-    # Draw shapes over image
+    # Draw horizontal divider line: y1=150, height=10, x1=60, x2=340
+    line_mask = Image.new("L", (size, size), 0)
+    l_draw = ImageDraw.Draw(line_mask)
+    l_draw.rectangle([60, 145, 340, 155], fill=255)
+    
+    line_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    line_layer.paste(grad, (0, 0), line_mask)
+    img = Image.alpha_composite(img, line_layer)
+    
+    # Traffic light dots
     draw = ImageDraw.Draw(img)
+    # Red dot
+    draw.ellipse([94 - 10, 120 - 10, 94 + 10, 120 + 10], fill="#F43F5E")
+    # Yellow dot
+    draw.ellipse([126 - 10, 120 - 10, 126 + 10, 120 + 10], fill="#FACC15")
+    # Green dot
+    draw.ellipse([158 - 10, 120 - 10, 158 + 10, 120 + 10], fill="#22C55E")
     
-    # Chat bubble base
-    bubble_path = [
-        (256, 108), (172, 108), (104, 168), (104, 243),
-        (104, 285), (126, 323), (160, 348), (157, 368),
-        (145, 387), (133, 403), (137, 412), (141, 412),
-        (176, 412), (203, 400), (224, 384), (236, 387),
-        (248, 388), (256, 388), (340, 388), (408, 327),
-        (408, 253), (408, 178), (340, 108), (256, 108)
-    ]
+    # Play Triangle: M175 172 l0 80 66-40z
+    tri_mask = Image.new("L", (size, size), 0)
+    t_draw = ImageDraw.Draw(tri_mask)
+    t_draw.polygon([(175, 172), (175, 252), (241, 212)], fill=255)
     
-    # Draw bubble base with white 14% opacity
-    bubble_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    b_draw = ImageDraw.Draw(bubble_layer)
-    b_draw.polygon(bubble_path, fill=(255, 255, 255, 36))
-    img = Image.alpha_composite(img, bubble_layer)
-    draw = ImageDraw.Draw(img)
+    tri_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    tri_layer.paste(grad, (0, 0), tri_mask)
+    img = Image.alpha_composite(img, tri_layer)
     
-    # 5 Audio waveform bars
-    bars = [
-        (150, 228, 26, 56),
-        (196, 192, 26, 128),
-        (242, 160, 26, 192),
-        (288, 192, 26, 128),
-        (334, 228, 26, 56),
-    ]
-    
-    for x, y, w, h in bars:
-        bar_box = [x, y, x + w, y + h]
-        draw.rounded_rectangle(bar_box, radius=13, fill=(255, 255, 255, 255))
-        
-    # AI Spark Accent (star)
-    star_points = [
-        (368, 132), (377, 152), (397, 161), (377, 170),
-        (368, 190), (359, 170), (339, 161), (359, 152)
-    ]
-    draw.polygon(star_points, fill=(255, 255, 255, 255))
-    
-    # Save PNG formats
+    # Save formats
     os.makedirs("public", exist_ok=True)
     os.makedirs("app", exist_ok=True)
     
@@ -90,10 +92,9 @@ def create_flowgentic_favicon():
     img.resize((128, 128), resample).save("app/icon.png", "PNG")
     img.resize((180, 180), resample).save("app/apple-icon.png", "PNG")
     
-    # Generate multi-resolution favicon.ico
     img.save("public/favicon.ico", format="ICO", sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128)])
     img.save("app/favicon.ico", format="ICO", sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128)])
-    print("SUCCESS: Overwritten public/favicon.ico and generated all favicon formats!")
+    print("SUCCESS: Updated all favicon formats with OS Window Trafficdots logo!")
 
 if __name__ == "__main__":
-    create_flowgentic_favicon()
+    draw_os_window_logo()
