@@ -31,10 +31,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/flowgentic-meet-icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.png', type: 'image/png' },
     ],
     shortcut: '/flowgentic-meet-icon.svg',
-    apple: '/flowgentic-meet-icon.svg',
+    apple: '/apple-icon.png',
   },
 };
 
