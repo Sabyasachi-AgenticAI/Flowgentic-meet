@@ -75,6 +75,11 @@ from api_helpers import (
     resolve_linear_issue,
     TICKETS,
     NEXT_TICKET_ID,
+    call_notion_api,
+    create_notion_page,
+    query_notion_database,
+    get_notion_page,
+    append_notion_block,
 )
 
 logger = logging.getLogger("agent")
@@ -184,6 +189,35 @@ async def my_agent(ctx: JobContext):
 
     # Connect to the LiveKit room
     await ctx.connect()
+
+    @ctx.room.on("data_received")
+    def on_data_received(data_packet):
+        try:
+            topic = getattr(data_packet, "topic", None)
+            data = getattr(data_packet, "data", b"")
+            if topic == "lk-scenario-switch":
+                payload = json.loads(data.decode("utf-8"))
+                scenario = payload.get("scenario")
+                logger.info(f"Received scenario switch request: {scenario}")
+                
+                async def handle_scenario_switch():
+                    if scenario == "gtm_product":
+                        from agents import PriyaAgent
+                        logger.info("Activated GTM & Product Review scenario")
+                        priya = PriyaAgent(chat_ctx=session.chat_ctx)
+                        session.update_agent(priya)
+                        await priya.show_linear_board()
+                    elif scenario == "tech_compliance":
+                        from agents import DianaAgent
+                        logger.info("Activated Technical & Compliance Audit scenario")
+                        diana = DianaAgent(chat_ctx=session.chat_ctx)
+                        session.update_agent(diana)
+                        await diana.show_compliance_dashboard()
+
+                import asyncio
+                asyncio.create_task(handle_scenario_switch())
+        except Exception as e:
+            logger.error(f"Error handling scenario switch data packet: {e}")
 
 
 if __name__ == "__main__":

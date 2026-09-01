@@ -89,6 +89,35 @@ body {
   text-align: center;
 }
 
+.hero-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.hero-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 1.5rem;
+  box-shadow: 0 12px 35px -8px rgba(139, 92, 246, 0.6), 0 0 25px rgba(139, 92, 246, 0.3);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  animation: logo-float 4s ease-in-out infinite alternate;
+}
+
+.hero-logo:hover {
+  transform: scale(1.08) rotate(2deg);
+  box-shadow: 0 20px 45px -5px rgba(139, 92, 246, 0.8), 0 0 35px rgba(167, 139, 250, 0.5);
+}
+
+@keyframes logo-float {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-6px);
+  }
+}
+
 .header h1 {
   font-family: 'Outfit', sans-serif;
   font-weight: 800;
@@ -195,6 +224,19 @@ footer a:hover {
   display: flex !important;
   flex-direction: column !important;
   gap: 1.5rem !important;
+}
+
+.lk-prejoin::before {
+  content: '';
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 0.5rem auto;
+  background-image: url('/flowgentic-meet-icon.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 8px 25px rgba(139, 92, 246, 0.6));
 }
 
 .lk-prejoin h2 {

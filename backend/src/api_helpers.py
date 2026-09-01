@@ -340,6 +340,82 @@ def send_teams_webhook_ping(webhook_url: str, text: str) -> bool:
         return False
 
 
+def call_notion_api(
+    endpoint: str, method: str = "GET", body: dict | None = None
+) -> dict | None:
+    """Base helper to make authenticated calls to the Notion API using standard urllib."""
+    api_key = os.getenv("NOTION_API_KEY")
+    if not api_key:
+        logger.error("NOTION_API_KEY not set")
+        return None
+
+    url = f"https://api.notion.com/v1/{endpoint.lstrip('/')}"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json",
+    }
+
+    req_data = json.dumps(body).encode("utf-8") if body is not None else None
+    req = urllib.request.Request(url, data=req_data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req) as response:
+            res_data = response.read().decode("utf-8")
+            return json.loads(res_data)
+    except Exception as e:
+        logger.error(f"Error calling Notion API {url}: {e}")
+        return None
+
+
+def create_notion_page(
+    parent_database_id: str | None = None,
+    parent_page_id: str | None = None,
+    properties: dict | None = None,
+    children: list | None = None,
+) -> dict | None:
+    """Creates a page in a Notion database or as a child page of another page."""
+    if not parent_database_id and not parent_page_id:
+        logger.error("Either parent_database_id or parent_page_id must be provided")
+        return None
+
+    parent = {}
+    if parent_database_id:
+        parent = {"database_id": parent_database_id}
+    else:
+        parent = {"page_id": parent_page_id}
+
+    body = {
+        "parent": parent,
+        "properties": properties or {},
+    }
+    if children:
+        body["children"] = children
+
+    return call_notion_api("pages", method="POST", body=body)
+
+
+def query_notion_database(
+    database_id: str, filter_params: dict | None = None
+) -> dict | None:
+    """Queries a Notion database for pages."""
+    body = {}
+    if filter_params:
+        body = filter_params
+    return call_notion_api(f"databases/{database_id}/query", method="POST", body=body)
+
+
+def get_notion_page(page_id: str) -> dict | None:
+    """Retrieves properties and details of a specific Notion page."""
+    return call_notion_api(f"pages/{page_id}", method="GET")
+
+
+def append_notion_block(block_id: str, children: list) -> dict | None:
+    """Appends blocks/content to a parent block or page."""
+    body = {"children": children}
+    return call_notion_api(f"blocks/{block_id}/children", method="PATCH", body=body)
+
+
 # Generate the default pptx file immediately on module load
 ensure_default_pptx_exists()
+
 

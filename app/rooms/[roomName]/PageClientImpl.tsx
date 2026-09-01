@@ -30,6 +30,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useSetupE2EE } from '@/lib/useSetupE2EE';
 import { AdminPanel } from './AdminPanel';
+import { ScenarioSwitcher } from './ScenarioSwitcher';
 import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
 
 const CONN_DETAILS_ENDPOINT =
@@ -275,10 +276,16 @@ function VideoConferenceComponent(props: {
   return (
     <div className="lk-room-container" style={{ position: 'relative' }}>
       <RoomContext.Provider value={room}>
-        <div style={{ position: 'fixed', top: '1.5rem', left: '1.5rem', zIndex: 1000 }}>
+        <div style={{ position: 'fixed', top: '1.25rem', left: '1.5rem', zIndex: 1000, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(0,0,0,0.55)', padding: '0.4rem 1rem 0.4rem 0.5rem', borderRadius: '2rem', border: '1px solid var(--border)', backdropFilter: 'blur(10px)' }}>
+            <img src="/flowgentic-meet-icon.svg" alt="Flowgentic Logo" style={{ width: '28px', height: '28px', borderRadius: '0.5rem' }} />
+            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.95rem', color: '#fff' }}>
+              Flowgentic <span style={{ color: 'var(--primary)' }}>Meet</span>
+            </span>
+          </div>
           <button 
             className="flowgentic-btn"
-            style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1.2rem', borderRadius: '2rem', border: '1px solid var(--border)', backdropFilter: 'blur(10px)', color: 'white', fontSize: '0.9rem', cursor: 'pointer' }}
+            style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1.2rem', borderRadius: '2rem', border: '1px solid var(--border)', backdropFilter: 'blur(10px)', color: 'white', fontSize: '0.85rem', cursor: 'pointer' }}
             onClick={() => {
               navigator.clipboard.writeText(window.location.href);
               alert('Meeting link copied!');
@@ -308,6 +315,7 @@ function VideoConferenceComponent(props: {
             {isInviting ? 'Summoning...' : 'Summon'}
           </button>
         </div>
+        <ScenarioSwitcher />
         <KeyboardShortcuts />
         
         <VideoConference

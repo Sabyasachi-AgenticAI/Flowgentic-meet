@@ -33,6 +33,13 @@ export default function Page() {
     <>
       <main className={styles.main}>
         <div className="header">
+          <div className="hero-logo-container">
+            <img 
+              src="/flowgentic-meet-icon.svg" 
+              alt="Flowgentic Meet Logo" 
+              className="hero-logo" 
+            />
+          </div>
           <h1>Flowgentic <span>Meet</span></h1>
           <p>
             The next generation of AI-native video conferencing. 

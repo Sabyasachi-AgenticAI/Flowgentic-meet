@@ -21,6 +21,11 @@ from api_helpers import (
     resolve_linear_issue,
     get_pptx_summary,
     send_teams_webhook_ping,
+    call_notion_api,
+    create_notion_page,
+    query_notion_database,
+    get_notion_page,
+    append_notion_block,
 )
 
 logger = logging.getLogger("agent")
@@ -440,7 +445,14 @@ class PriyaAgent(GenericAgent):
             res = await self.session.presenter.start_browser_session()
             if "Error" in res:
                 return res
-            res = await self.session.presenter.browse_to("https://linear.app/flowgentic/team/FLO/backlog")
+            
+            backlog_html_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "linear_backlog.html"))
+            if os.path.exists(backlog_html_path):
+                file_url = f"file:///{backlog_html_path.replace(os.sep, '/')}"
+                logger.info(f"Navigating browser to local Linear backlog file: {file_url}")
+                res = await self.session.presenter.browse_to(file_url)
+            else:
+                res = await self.session.presenter.browse_to("https://linear.app/flowgentic/team/FLO/backlog")
             return res
         return "Slide presenter is not available in this session."
 

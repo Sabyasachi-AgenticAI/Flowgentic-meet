@@ -29,10 +29,12 @@ export const metadata: Metadata = {
     siteName: 'Flowgentic Meet',
   },
   icons: {
-    icon: {
-      rel: 'icon',
-      url: '/favicon.ico',
-    },
+    icon: [
+      { url: '/flowgentic-meet-icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: '/flowgentic-meet-icon.svg',
+    apple: '/flowgentic-meet-icon.svg',
   },
 };
 
