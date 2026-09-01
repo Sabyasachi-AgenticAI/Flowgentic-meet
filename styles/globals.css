@@ -92,30 +92,22 @@ body {
 .hero-logo-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 1.25rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .hero-logo {
-  width: 100px;
-  height: 100px;
-  border-radius: 1.5rem;
-  box-shadow: 0 12px 35px -8px rgba(139, 92, 246, 0.6), 0 0 25px rgba(139, 92, 246, 0.3);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-  animation: logo-float 4s ease-in-out infinite alternate;
+  width: 150px;
+  height: 150px;
+  box-shadow: none !important;
+  filter: none !important;
+  transition: transform 0.3s ease;
 }
 
 .hero-logo:hover {
-  transform: scale(1.08) rotate(2deg);
-  box-shadow: 0 20px 45px -5px rgba(139, 92, 246, 0.8), 0 0 35px rgba(167, 139, 250, 0.5);
-}
-
-@keyframes logo-float {
-  0% {
-    transform: translateY(0px);
-  }
-  100% {
-    transform: translateY(-6px);
-  }
+  transform: scale(1.05);
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 .header h1 {
@@ -169,24 +161,25 @@ footer a:hover {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-  color: white;
-  border: none;
-  padding: 1.25rem 3rem;
-  font-size: 1.25rem;
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 50%, #7c3aed 100%);
+  color: #ffffff;
+  padding: 1.15rem 2.75rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  border-radius: 1.25rem;
+  border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.5);
+  transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 10px 30px -8px rgba(139, 92, 246, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.3);
   font-family: 'Outfit', sans-serif;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  letter-spacing: -0.01em;
 }
 
 .flowgentic-btn-hero:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 40px -15px rgba(139, 92, 246, 0.6);
-  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  transform: translateY(-3px) scale(1.03);
+  background: linear-gradient(135deg, #c084fc 0%, #9333ea 50%, #6d28d9 100%);
+  box-shadow: 0 18px 40px -5px rgba(167, 139, 250, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .flowgentic-btn-hero:active {
